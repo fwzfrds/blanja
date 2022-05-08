@@ -1,5 +1,6 @@
 const productsModel = require('../models/productsModel')
 const createError = require('http-errors')
+const commonHelper = require('../helper/common')
 const errorServer = new createError.InternalServerError()
 
 const getProducts = async (req, res, next) => {
@@ -24,12 +25,13 @@ const getProducts = async (req, res, next) => {
             totalPage
         }
 
-        res.status(200).json({
-            status: 200,
-            message: 'Get data success',
-            pagination,
-            data: result.rows
-        })
+        // res.status(200).json({
+        //     status: 200,
+        //     message: 'Get data success',
+        //     pagination,
+        //     data: result.rows
+        // })
+        commonHelper.response(res, result.rows, 200, 'Get data success', pagination)
     } catch (error) {
         console.log(error)
         next(errorServer)
@@ -40,9 +42,11 @@ const detailProduct = async (req, res) => {
     try {
         const id = req.params.id
         const result = await productsModel.getProductById(id)
-        res.json({
-            data: result.rows[0]
-        })
+        // res.json({
+        //     data: result.rows[0]
+        // })
+        commonHelper.response(res, result.rows[0], 200, 'Get data success')
+
     } catch (error) {
         console.log(error)
     }
@@ -63,11 +67,13 @@ const insertProduct = async (req, res, next) => {
 
         await productsModel.insert(data)
 
-        res.status(201).json({
-            status: 201,
-            message: 'insert data success',
-            data
-        })
+        // res.status(201).json({
+        //     status: 201,
+        //     message: 'insert data success',
+        //     data
+        // })
+
+        commonHelper.response(res, data, 201, 'Insert data success')
 
     } catch (error) {
 
@@ -93,11 +99,13 @@ const updateProduct = async (req, res, next) => {
 
     try {
         await productsModel.update(data, id)
-        res.status(200).json({
-            status: 200,
-            message: 'Product Data updated successfully',
-            data
-        })
+        // res.status(200).json({
+        //     status: 200,
+        //     message: 'Product Data updated successfully',
+        //     data
+        // })
+
+        commonHelper.response(res, data, 200, 'Update data success')
 
     } catch (error) {
         console.log(error)
@@ -111,9 +119,11 @@ const deleteProduct = (req, res, next) => {
 
     try {
         productsModel.deleteProduct(id)
-        res.json({
-            message: 'Delete data success'
-        })
+        // res.json({
+        //     message: 'Delete data success'
+        // })
+
+        commonHelper.response(res, id, 200, `Delete data where id = ${id} success`)
     } catch (error) {
         console.log(error)
         next(errorServer)
