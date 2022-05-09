@@ -25,7 +25,16 @@ const insert = ({ firstName, lastName, email, userPassword, phone, gender, birth
 
 const update = ({ firstName, lastName, email, userPassword, phone, gender, birth, userAddress }, id) => {
   return new Promise((resolve, reject) => {
-    pool.query('UPDATE users SET first_name = $1, last_name = $2, email = $3, user_password = $4, phone = $5, gender = $6, birth = $7, user_address = $8 WHERE id= $9', [firstName, lastName, email, userPassword, phone, gender, birth, userAddress, id], (err, result) => {
+    pool.query(`UPDATE users SET 
+                  first_name = COALESCE($1, first_name), 
+                  last_name = COALESCE($2, last_name), 
+                  email = COALESCE($3, email),
+                  user_password = COALESCE($4, user_password), 
+                  phone = COALESCE($5, phone), 
+                  gender = COALESCE($6, gender), 
+                  birth = COALESCE($7, birth), 
+                  user_address = COALESCE($8, user_address) 
+                  WHERE id= $9`, [firstName, lastName, email, userPassword, phone, gender, birth, userAddress, id], (err, result) => {
       if (!err) {
         resolve(result)
       } else {

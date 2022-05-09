@@ -16,7 +16,8 @@ const getProducts = async (req, res, next) => {
     const result = await productsModel.select({ limit, offset, sortBy, sortOrder, search })
 
     const { rows: [count] } = await productsModel.countProducts()
-    const totalData = parseInt(count.total)
+
+    const totalData = search === undefined ? parseInt(count.total) : (result.rows).length
     const totalPage = Math.ceil(totalData / limit)
     const pagination = {
       currentPage: page,
@@ -25,6 +26,11 @@ const getProducts = async (req, res, next) => {
       totalPage
     }
 
+    if ((result.rows).length === 0) {
+      res.status(200).json({
+        message: 'Data not found'
+      })
+    }
     // res.status(200).json({
     //     status: 200,
     //     message: 'Get data success',
