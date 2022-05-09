@@ -38,6 +38,24 @@ CREATE TABLE carts(
     updated_at TIMESTAMP
 );
 
+CREATE TABLE transactions(
+    id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    id_cart INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    status INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+-- 0 : belun bayar
+-- 1 : sudah bayar & menunggu konfirmasi Pembayaran oleh admin toko
+-- 2 : Pembayaran Confirmed
+-- 3 : Order sedag diproses
+-- 4 : Barang dalam pengiriman
+-- 5 : Barang tiba ditujuan
+-- 6 : Barang ada komplain
+
 
 CREATE TABLE products(
     id INT NOT NULL GENERATED ALWAYS AS IDENTITY,
