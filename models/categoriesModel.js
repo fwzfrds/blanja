@@ -17,7 +17,7 @@ const countCategories = () => {
 
 const insert = ({ name, description }) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO categories(name, description)VALUES($1, $2)', [name, description], (err, result) => {
+    pool.query('INSERT INTO categories(name, description)VALUES($1, $2);', [name, description], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -25,6 +25,14 @@ const insert = ({ name, description }) => {
       }
     })
   })
+}
+
+const checkExisting = (id) => {
+  return pool.query(`SELECT COUNT(*) AS total FROM categories WHERE id = ${id};`)
+}
+
+const getCategoryById = (id) => {
+  return pool.query(`SELECT * FROM categories WHERE id = ${id};`)
 }
 
 const update = ({ name, description, updatedAt }, id) => {
@@ -51,6 +59,8 @@ module.exports = {
   select,
   insert,
   countCategories,
+  checkExisting,
+  getCategoryById,
   update,
   deleteCategory
 }

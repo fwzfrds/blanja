@@ -72,3 +72,16 @@ CREATE TABLE products(
 SELECT products.*, categories.name AS name_category FROM products INNER JOIN categories ON products.id_category = categories.id;
 
 SELECT carts.*, products.name AS name_product FROM carts INNER JOIN products ON carts.id_product = products.id WHERE carts.id_user = 2;
+
+--join 3 tables
+SELECT carts.*, products.name AS product_name, products.price AS product_price, users.first_name FROM carts INNER JOIN products ON carts.id_product = products.id INNER JOIN users ON carts.id_user = users.id WHERE carts.id_user = 1;
+
+--get seharusnya di transactions users.id ganti saja dengan id dari variabel (gabungan 3 tabel)
+SELECT transactions.id, transactions.id_cart, transactions.name, transactions.phone, carts.id_product,carts.id_user, carts.qty, users.first_name FROM transactions INNER JOIN carts ON transactions.id_cart = carts.id INNER JOIN users ON carts.id_user = users.id WHERE id_user = users.id;
+
+--get seharusnya di transactions users.id ganti saja dengan id dari variabel (gabungan 4 tabel)
+SELECT transactions.id, transactions.id_cart, transactions.name, transactions.phone, carts.id_product,carts.id_user, carts.qty, users.first_name, users.last_name, products.name AS product_name FROM transactions INNER JOIN carts ON transactions.id_cart = carts.id INNER JOIN users ON carts.id_user = users.id INNER JOIN products ON carts.id_product = products.id WHERE id_user = users.id;
+
+SELECT COUNT(*) FROM (
+    SELECT transactions.id, transactions.id_cart, transactions.name, transactions.phone, carts.id_product,carts.id_user, carts.qty, users.first_name, users.last_name, products.name FROM transactions INNER JOIN carts ON transactions.id_cart = carts.id INNER JOIN users ON carts.id_user = users.id INNER JOIN products ON carts.id_product = products.id WHERE id_user = 1
+) as count_data;

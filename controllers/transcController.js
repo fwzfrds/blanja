@@ -5,7 +5,7 @@ const errorServer = new createError.InternalServerError()
 const getTransc = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 4
+    let limit = parseInt(req.query.limit) || 4
     const offset = (page - 1) * limit
 
     const id = req.params.id
@@ -13,7 +13,16 @@ const getTransc = async (req, res, next) => {
     const result = await transcModel.select({ limit, offset, id })
 
     const { rows: [count] } = await transcModel.countTransc(id)
-    const totalData = parseInt(count.total)
+    const totalData = parseInt(count.count)
+    console.log(totalData)
+
+    limit = totalData < limit ? totalData : limit
+    // if (totalData < limit) {
+    //   limit = totalData
+    // }
+
+    console.log(limit)
+
     const totalPage = Math.ceil(totalData / limit)
     const pagination = {
       currentPage: page,

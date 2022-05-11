@@ -50,6 +50,10 @@ const update = ({ name, description, qty, price, idCategory, updatedAt }, id) =>
   })
 }
 
+const checkExisting = (id) => {
+  return pool.query(`SELECT COUNT(*) AS total FROM products WHERE id = ${id}`)
+}
+
 const deleteProduct = (id) => {
   return pool.query('DELETE FROM products WHERE id = $1', [id])
 }
@@ -60,5 +64,6 @@ module.exports = {
   countProducts,
   insert,
   update,
+  checkExisting,
   deleteProduct
 }

@@ -5,13 +5,24 @@ const errorServer = new createError.InternalServerError()
 const getAdmins = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 4
+    let limit = parseInt(req.query.limit) || 4
     const offset = (page - 1) * limit
 
     const result = await adminModel.select({ limit, offset })
 
     const { rows: [count] } = await adminModel.countAdmins()
     const totalData = parseInt(count.total)
+
+    if (totalData < limit) {
+      limit = totalData
+    }
+
+    if ((result.rows).length === 0) {
+      res.json({
+        message: 'Data not found in this page'
+      })
+    }
+
     const totalPage = Math.ceil(totalData / limit)
     const pagination = {
       currentPage: page,

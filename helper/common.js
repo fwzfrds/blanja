@@ -8,6 +8,15 @@ const response = (res, result, status, message, pagination) => {
   res.status(status).json(resultPrint)
 }
 
+const notFoundRes = (res, status, message) => {
+  const resultPrint = {}
+  resultPrint.status = 'Not Found'
+  resultPrint.message = message || null
+  resultPrint.statusCode = status
+  res.status(status).json(resultPrint)
+}
+
 module.exports = {
-  response
+  response,
+  notFoundRes
 }

@@ -2,12 +2,16 @@ const pool = require('../db')
 
 const select = ({ limit, offset, id }) => {
   return new Promise((resolve, reject) => {
-    // pool.query(`SELECT * FROM carts WHERE id_user='${id}' LIMIT ${limit} OFFSET ${offset}`, (err, result) => {
     pool.query(`SELECT carts.*, 
                     products.name AS name_product,
-                    products.price AS price_product
-                    FROM carts INNER JOIN products ON 
-                    carts.id_product = products.id WHERE carts.id_user = ${id}
+                    products.price AS price_product,
+                    users.first_name,
+                    users.last_name
+                    FROM carts INNER JOIN products 
+                    ON carts.id_product = products.id
+                    INNER JOIN users 
+                    ON carts.id_user = users.id
+                    WHERE carts.id_user = ${id}
                     LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
       if (!err) {
         resolve(result)

@@ -2,7 +2,23 @@ const pool = require('../db')
 
 const select = ({ limit, offset, id }) => {
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT * FROM transactions WHERE id_cart = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
+    // pool.query(`SELECT * FROM transactions WHERE id_cart = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
+    pool.query(`SELECT transactions.id, 
+                  transactions.id_cart, 
+                  transactions.name,
+                  transactions.address, 
+                  transactions.phone, 
+                  carts.id_product, 
+                  carts.id_user, 
+                  products.name AS product_name,
+                  carts.qty, 
+                  users.first_name, 
+                  users.last_name 
+                  FROM transactions 
+                  INNER JOIN carts ON transactions.id_cart = carts.id 
+                  INNER JOIN users ON carts.id_user = users.id 
+                  INNER JOIN products ON carts.id_product = products.id 
+                  WHERE id_user = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -13,7 +29,16 @@ const select = ({ limit, offset, id }) => {
 }
 
 const countTransc = (id) => {
-  return pool.query(`SELECT COUNT(*) AS total FROM transactions WHERE id_cart='${id}'`)
+  // return pool.query(`SELECT COUNT(*) AS total FROM transactions WHERE id_cart='${id}'`)
+  return pool.query(`SELECT COUNT(*) FROM 
+  (
+    SELECT transactions.id, transactions.id_cart, transactions.name, transactions.phone, 
+           carts.id_product,carts.id_user, carts.qty, 
+           users.first_name, products.name 
+    FROM transactions INNER JOIN carts ON transactions.id_cart = carts.id 
+    INNER JOIN users ON carts.id_user = users.id INNER JOIN products ON carts.id_product = products.id WHERE id_user = ${id}
+  ) AS total;`)
+  // perbaiki bagian count ini supaya count transaction berdasarkan id user
 }
 
 const insert = ({ idCart, name, phone, address, status }) => {

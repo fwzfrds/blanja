@@ -1,12 +1,12 @@
 const productsModel = require('../models/productsModel')
 const createError = require('http-errors')
-const commonHelper = require('../helper/common')
+const { response, notFoundRes } = require('../helper/common')
 const errorServer = new createError.InternalServerError()
 
 const getProducts = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 4
+    let limit = parseInt(req.query.limit) || 4
     const offset = (page - 1) * limit
 
     const sortBy = req.query.sortby
@@ -16,8 +16,19 @@ const getProducts = async (req, res, next) => {
     const result = await productsModel.select({ limit, offset, sortBy, sortOrder, search })
 
     const { rows: [count] } = await productsModel.countProducts()
-
     const totalData = search === undefined ? parseInt(count.total) : (result.rows).length
+
+    if (totalData < limit) {
+      limit = totalData
+    }
+
+    if ((result.rows).length === 0) {
+      // res.status(200).json({
+      //   message: 'Data not found in this page'
+      // })
+      notFoundRes(res, 404, 'Data not found')
+    }
+
     const totalPage = Math.ceil(totalData / limit)
     const pagination = {
       currentPage: page,
@@ -26,18 +37,13 @@ const getProducts = async (req, res, next) => {
       totalPage
     }
 
-    if ((result.rows).length === 0) {
-      res.status(200).json({
-        message: 'Data not found'
-      })
-    }
     // res.status(200).json({
     //     status: 200,
     //     message: 'Get data success',
     //     pagination,
     //     data: result.rows
     // })
-    commonHelper.response(res, result.rows, 200, 'Get data success', pagination)
+    response(res, result.rows, 200, 'Get data success', pagination)
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -51,7 +57,11 @@ const detailProduct = async (req, res) => {
     // res.json({
     //     data: result.rows[0]
     // })
-    commonHelper.response(res, result.rows[0], 200, 'Get data success')
+
+    if ((result.rows).length === 0) {
+      notFoundRes(res, 404, 'Data not found')
+    }
+    response(res, result.rows[0], 200, 'Get data success')
   } catch (error) {
     console.log(error)
   }
@@ -77,7 +87,7 @@ const insertProduct = async (req, res, next) => {
     //     data
     // })
 
-    commonHelper.response(res, data, 201, 'Insert data success')
+    response(res, data, 201, 'Insert product data success')
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -99,6 +109,14 @@ const updateProduct = async (req, res, next) => {
   }
 
   try {
+    const { rows: [count] } = await productsModel.checkExisting(id)
+    const result = parseInt(count.total)
+
+    console.log(result)
+    if (result === 0) {
+      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+    }
+
     await productsModel.update(data, id)
     // res.status(200).json({
     //     status: 200,
@@ -106,23 +124,32 @@ const updateProduct = async (req, res, next) => {
     //     data
     // })
 
-    commonHelper.response(res, data, 200, 'Update data success')
+    response(res, data, 200, 'Update data success')
   } catch (error) {
     console.log(error)
     next(errorServer)
   }
 }
 
-const deleteProduct = (req, res, next) => {
+const deleteProduct = async (req, res, next) => {
   const id = req.params.id
 
   try {
-    productsModel.deleteProduct(id)
+    const { rows: [count] } = await productsModel.checkExisting(id)
+
+    const result = parseInt(count.total)
+
+    console.log(result)
+    if (result === 0) {
+      notFoundRes(res, 404, 'Data not found, you cannot delete the data which is not exist')
+    }
+
+    await productsModel.deleteProduct(id)
     // res.json({
     //     message: 'Delete data success'
     // })
 
-    commonHelper.response(res, id, 200, `Delete data where id = ${id} success`)
+    response(res, id, 200, 'Delete data success')
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -136,5 +163,3 @@ module.exports = {
   updateProduct,
   deleteProduct
 }
-
-// terakhir nerapin commonHelper
