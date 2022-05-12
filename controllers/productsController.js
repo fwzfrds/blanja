@@ -7,11 +7,11 @@ const getProducts = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1
     let limit = parseInt(req.query.limit) || 4
-    const offset = (page - 1) * limit
+    const offset = (page - 1) * limit || 0
 
-    const sortBy = req.query.sortby
-    const sortOrder = req.query.sortorder
-    const search = req.query.search
+    const sortBy = req.query.sortby || 'id'
+    const sortOrder = req.query.sortorder || 'asc'
+    const search = req.query.search || ''
 
     const result = await productsModel.select({ limit, offset, sortBy, sortOrder, search })
 
@@ -112,7 +112,6 @@ const updateProduct = async (req, res, next) => {
     const { rows: [count] } = await productsModel.checkExisting(id)
     const result = parseInt(count.total)
 
-    console.log(result)
     if (result === 0) {
       notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
     }

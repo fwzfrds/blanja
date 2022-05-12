@@ -1,5 +1,6 @@
 const adminModel = require('../models/adminModel')
 const createError = require('http-errors')
+const { response, notFoundRes } = require('../helper/common')
 const errorServer = new createError.InternalServerError()
 
 const getAdmins = async (req, res, next) => {
@@ -18,9 +19,7 @@ const getAdmins = async (req, res, next) => {
     }
 
     if ((result.rows).length === 0) {
-      res.json({
-        message: 'Data not found in this page'
-      })
+      notFoundRes(res, 404, 'Data not found')
     }
 
     const totalPage = Math.ceil(totalData / limit)
@@ -31,12 +30,7 @@ const getAdmins = async (req, res, next) => {
       totalPage
     }
 
-    res.status(200).json({
-      status: 200,
-      message: 'Get data success',
-      pagination,
-      data: result.rows
-    })
+    response(res, result.rows, 200, 'Get data success', pagination)
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -54,12 +48,7 @@ const insertAdmin = async (req, res, next) => {
 
   try {
     await adminModel.insert(data)
-
-    res.status(201).json({
-      status: 201,
-      message: 'insert data success',
-      data
-    })
+    response(res, data, 201, 'Insert admin data success')
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -79,12 +68,17 @@ const updateAdmin = async (req, res, next) => {
   }
 
   try {
+    const { rows: [count] } = await adminModel.checkExisting(id)
+    const result = parseInt(count.total)
+
+    console.log(result)
+    if (result === 0) {
+      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+    }
+
     await adminModel.update(data, id)
-    res.status(200).json({
-      status: 200,
-      message: 'Category Data updated successfully',
-      data
-    })
+
+    response(res, data, 200, 'Admin data has just been updated')
   } catch (error) {
     console.log(error)
     next(errorServer)

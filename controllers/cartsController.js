@@ -1,5 +1,6 @@
 const cartsModel = require('../models/cartsModel')
 const createError = require('http-errors')
+const { response, notFoundRes } = require('../helper/common')
 const errorServer = new createError.InternalServerError()
 
 const getCarts = async (req, res, next) => {
@@ -20,9 +21,7 @@ const getCarts = async (req, res, next) => {
     }
 
     if ((result.rows).length === 0) {
-      res.json({
-        message: 'Data not found in this page'
-      })
+      notFoundRes(res, 404, 'Data not found')
     }
 
     const totalPage = Math.ceil(totalData / limit)
@@ -33,12 +32,7 @@ const getCarts = async (req, res, next) => {
       totalPage
     }
 
-    res.status(200).json({
-      status: 200,
-      message: 'Get data success',
-      pagination,
-      data: result.rows
-    })
+    response(res, result.rows, 200, 'Get data success', pagination)
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -115,3 +109,5 @@ module.exports = {
   deleteCart,
   updateCartQty
 }
+
+// terakhir sampai sini

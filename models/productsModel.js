@@ -1,7 +1,7 @@
 const pool = require('../db')
-const select = ({ limit = '4', offset = '0', sortBy = 'id', sortOrder = 'asc', search = '' }) => {
+const select = ({ limit, offset, sortBy, sortOrder, search }) => {
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT * FROM products WHERE LOWER(name) LIKE LOWER('%${search}%') ORDER BY ${sortBy} ${sortOrder} LIMIT ${limit} OFFSET ${offset}`, (err, result) => {
+    pool.query(`SELECT * FROM products WHERE name ILIKE '%${search}%' ORDER BY ${sortBy} ${sortOrder} LIMIT ${limit} OFFSET ${offset}`, (err, result) => {
       if (!err) {
         resolve(result)
       } else {

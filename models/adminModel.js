@@ -27,6 +27,10 @@ const insert = ({ name, email, phone }) => {
   })
 }
 
+const checkExisting = (id) => {
+  return pool.query(`SELECT COUNT(*) AS total FROM admins WHERE id = ${id}`)
+}
+
 const update = ({ name, email, phone, updatedAt }, id) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE admins SET 
@@ -48,5 +52,6 @@ module.exports = {
   select,
   countAdmins,
   insert,
-  update
+  update,
+  checkExisting
 }
