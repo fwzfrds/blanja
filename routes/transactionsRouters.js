@@ -1,12 +1,16 @@
 const express = require('express')
 const router = express.Router()
-const transcController = require('../controllers/transcController')
+const {
+  getTransc,
+  insertTransc,
+  updateTransStatus
+} = require('../controllers/transcController')
 
 //  ----> /transactions.....
 router
-  .get('/:id', transcController.getTransc)
-  .post('/', transcController.insertTransc)
-  .put('/:id', transcController.updateTransStatus)
+  .get('/:id', getTransc)
+  .post('/', insertTransc)
+  .put('/:id', updateTransStatus)
 // .delete("/:id", cartsController.deleteCart);
 
 module.exports = router

@@ -1,5 +1,6 @@
 const usersModel = require('../models/usersModel')
 const createError = require('http-errors')
+// const bcrypt = require('bcryptjs')
 const { response, notFoundRes } = require('../helper/common')
 
 const errorServer = new createError.InternalServerError()

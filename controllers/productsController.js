@@ -1,5 +1,6 @@
 const productsModel = require('../models/productsModel')
 const createError = require('http-errors')
+// const xss = require('xss')
 const { response, notFoundRes } = require('../helper/common')
 const errorServer = new createError.InternalServerError()
 
@@ -16,7 +17,7 @@ const getProducts = async (req, res, next) => {
     const result = await productsModel.select({ limit, offset, sortBy, sortOrder, search })
 
     const { rows: [count] } = await productsModel.countProducts()
-    const totalData = search === undefined ? parseInt(count.total) : (result.rows).length
+    const totalData = search === '' ? parseInt(count.total) : (result.rows).length
 
     if (totalData < limit) {
       limit = totalData
