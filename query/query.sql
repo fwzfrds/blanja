@@ -1,16 +1,31 @@
-CREATE TABLE users (id INT NOT NULL GENERATED ALWAYS AS IDENTITY, 
-    first_name varchar(255), 
-    last_name varchar(255), 
-    email varchar(255),
-    user_password varchar(255), 
-    phone varchar(255), 
-    gender varchar(255), 
+CREATE TABLE users (id varchar(64) NOT NULL, 
+    first_name varchar(64) NOT NULL, 
+    last_name varchar(64) NOT NULL, 
+    email varchar(64) NOT NULL,
+    user_password varchar(64) NOT NULL, 
+    phone varchar(64),
+    id_status INT DEFAULT 0, 
+    id_gender INT DEFAULT 0, 
     birth date, 
     user_address varchar(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id)
 );
+
+CREATE TABLE activation (
+    id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    activation_name varchar(63) NOT NULL
+);
+
+CREATE TABLE gender (
+    id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    gender_name varchar(63) NOT NULL
+);
+
+
+--edit column
+ALTER TABLE users ALTER COLUMN first_name VARCHAR(64) NOT NULL;
 
 CREATE TABLE categories(
     id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -85,3 +100,4 @@ SELECT transactions.id, transactions.id_cart, transactions.name, transactions.ph
 SELECT COUNT(*) FROM (
     SELECT transactions.id, transactions.id_cart, transactions.name, transactions.phone, carts.id_product,carts.id_user, carts.qty, users.first_name, users.last_name, products.name FROM transactions INNER JOIN carts ON transactions.id_cart = carts.id INNER JOIN users ON carts.id_user = users.id INNER JOIN products ON carts.id_product = products.id WHERE id_user = 1
 ) as count_data;
+

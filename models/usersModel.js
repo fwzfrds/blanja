@@ -11,9 +11,21 @@ const select = ({ limit, offset }) => {
   })
 }
 
-const insert = ({ firstName, lastName, email, userPassword, phone, gender, birth, userAddress }) => {
+const findByEmail = (email) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO users(first_name, last_name, email, user_password, phone, gender, birth, user_address)VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [firstName, lastName, email, userPassword, phone, gender, birth, userAddress], (err, result) => {
+    pool.query('SELECT * FROM users WHERE email = $1', [email], (error, result) => {
+      if (!error) {
+        resolve(result)
+      } else {
+        reject(error)
+      }
+    })
+  })
+}
+
+const insert = ({ id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress }) => {
+  return new Promise((resolve, reject) => {
+    pool.query('INSERT INTO users(id, first_name, last_name, email, user_password, phone, id_status, id_gender, birth, user_address)VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -23,22 +35,23 @@ const insert = ({ firstName, lastName, email, userPassword, phone, gender, birth
   })
 }
 
-const checkExisting = (id) => {
-  return pool.query(`SELECT COUNT(*) AS total FROM users WHERE id = ${id}`)
+const checkExisting = (emailID) => {
+  return pool.query(`SELECT COUNT(*) AS total FROM users WHERE email = '${emailID}';`)
 }
 
-const update = ({ firstName, lastName, email, userPassword, phone, gender, birth, userAddress }, id) => {
+const update = ({ firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress }, emailID) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE users SET 
-                  first_name = COALESCE($1, first_name), 
-                  last_name = COALESCE($2, last_name), 
-                  email = COALESCE($3, email),
-                  user_password = COALESCE($4, user_password), 
-                  phone = COALESCE($5, phone), 
-                  gender = COALESCE($6, gender), 
-                  birth = COALESCE($7, birth), 
-                  user_address = COALESCE($8, user_address) 
-                  WHERE id= $9`, [firstName, lastName, email, userPassword, phone, gender, birth, userAddress, id], (err, result) => {
+                  first_name = COALESCE(${firstName}, first_name), 
+                  last_name = COALESCE(${lastName}, last_name), 
+                  email = COALESCE(${email}, email),
+                  user_password = COALESCE(${userPassword}, user_password), 
+                  phone = COALESCE(${phone}, phone), 
+                  id_status = COALESCE(${activationStatus}, id_status), 
+                  id_gender = COALESCE(${gender}, id_gender), 
+                  birth = COALESCE(${birth}, birth), 
+                  user_address = COALESCE(${userAddress}, user_address) 
+                  WHERE email = '${emailID}';`, (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -62,5 +75,6 @@ module.exports = {
   deleteUsers,
   update,
   countUser,
-  checkExisting
+  checkExisting,
+  findByEmail
 }

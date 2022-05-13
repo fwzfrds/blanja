@@ -1,6 +1,7 @@
 const usersModel = require('../models/usersModel')
 const createError = require('http-errors')
-// const bcrypt = require('bcryptjs')
+const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcryptjs')
 const { response, notFoundRes } = require('../helper/common')
 
 const errorServer = new createError.InternalServerError()
@@ -32,6 +33,9 @@ const getUsers = async (req, res, next) => {
       totalPage
     }
 
+    const dob = new Date('12/11/1981')
+    console.log(dob)
+
     response(res, result.rows, 200, 'Get data success', pagination)
   } catch (error) {
     console.log(error)
@@ -39,16 +43,28 @@ const getUsers = async (req, res, next) => {
   }
 }
 
+const getProfileDetail = async (req, res, next) => {
+  const emailID = req.params.emailid
+  const { rows: [user] } = await usersModel.findByEmail(emailID)
+  delete user.user_password
+  response(res, user, 200, 'Get Data success')
+}
+
 const insertUsers = async (req, res, next) => {
-  const { firstName, lastName, email, userPassword, phone, gender, birth, userAddress } = req.body
+  const { firstName, lastName, email, password, phone, activationID, genderID, birth, userAddress } = req.body
+
+  const salt = bcrypt.genSaltSync(10)
+  const userPassword = bcrypt.hashSync(password, salt)
 
   const data = {
+    id: uuidv4(),
     firstName,
     lastName,
     email,
     userPassword,
     phone,
-    gender,
+    activationID: activationID || 0,
+    genderID: genderID || 0,
     birth,
     userAddress
   }
@@ -102,8 +118,8 @@ const insertUsers = async (req, res, next) => {
 }
 
 const updateUsers = async (req, res, next) => {
-  const id = req.params.id
-  const { firstName, lastName, email, userPassword, phone, gender, birth, userAddress } = req.body
+  const emailID = req.params.emailid
+  const { firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress } = req.body
 
   const data = {
     firstName,
@@ -111,20 +127,25 @@ const updateUsers = async (req, res, next) => {
     email,
     userPassword,
     phone,
+    activationStatus,
     gender,
     birth,
     userAddress
   }
 
+  console.log(data)
+
   try {
-    const { rows: [count] } = await usersModel.checkExisting(id)
+    const { rows: [count] } = await usersModel.checkExisting(emailID)
     const result = parseInt(count.total)
+
+    console.log(result)
 
     if (result === 0) {
       notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
     }
 
-    await usersModel.update(data, id)
+    await usersModel.update(data, emailID)
     response(res, data, 200, 'User data has just been updated')
   } catch (error) {
     console.log(error)
@@ -148,5 +169,6 @@ module.exports = {
   getUsers,
   insertUsers,
   deleteUsers,
-  updateUsers
+  updateUsers,
+  getProfileDetail
 }

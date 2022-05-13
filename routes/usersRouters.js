@@ -4,14 +4,16 @@ const {
   getUsers,
   insertUsers,
   updateUsers,
-  deleteUsers
+  deleteUsers,
+  getProfileDetail
 } = require('../controllers/usersController')
 
 //  ----> /users.....
 router
   .get('/', getUsers)
+  .get('/profile/:emailid', getProfileDetail)
   .post('/', insertUsers)
-  .put('/:id', updateUsers)
+  .put('/:emailid', updateUsers)
   .delete('/:id', deleteUsers)
 
 module.exports = router
