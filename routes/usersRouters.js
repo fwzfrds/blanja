@@ -8,15 +8,15 @@ const {
   getProfileDetail,
   loginUsers
 } = require('../controllers/usersController')
-const { authorizedUser } = require('../middlewares/authMiddleware')
+const { authorizedUser, isUser } = require('../middlewares/authMiddleware')
 
 //  ----> /users.....
 router
   .get('/', getUsers)
-  .get('/profile/:emailid', authorizedUser, getProfileDetail)
+  .get('/profile', authorizedUser, isUser, getProfileDetail)
   .post('/registration', insertUsers)
   .post('/login', loginUsers)
-  .put('/:emailid', updateUsers)
+  .put('/edit', authorizedUser, updateUsers)
   .delete('/:emailid', deleteUsers)
 
 module.exports = router

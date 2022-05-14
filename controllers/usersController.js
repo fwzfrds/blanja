@@ -1,4 +1,5 @@
 const usersModel = require('../models/usersModel')
+const adminModel = require('../models/adminModel')
 const createError = require('http-errors')
 const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcryptjs')
@@ -48,9 +49,19 @@ const getUsers = async (req, res, next) => {
 }
 
 const getProfileDetail = async (req, res, next) => {
-  const email = req.params.emailid
-  console.log(email)
+  // const email = req.params.emailid
+  const decode = req.decoded
+  console.log(decode)
+  const email = req.decoded.email
   const { rows: [user] } = await usersModel.findByEmail(email)
+
+  if (user === undefined) {
+    res.json({
+      messgae: 'invalid token'
+    })
+    return
+  }
+
   delete user.user_password
   response(res, user, 200, 'Get Data success')
 }
@@ -75,11 +86,21 @@ const insertUsers = async (req, res, next) => {
   }
 
   try {
-    const { rows: [count] } = await usersModel.checkExisting(emailID)
-    const result = parseInt(count.total)
+    // Check Email in users's table
+    const { rows: [count1] } = await usersModel.checkExisting(emailID)
+    const result1 = parseInt(count1.total)
+    // Check Email in admin's table
+    const { rows: [count2] } = await adminModel.checkByEmail(emailID)
+    const result2 = parseInt(count2.total)
 
-    if (result !== 0) {
+    if (result1 !== 0) {
       notFoundRes(res, 403, 'Email has already been taken')
+      return
+    }
+
+    if (result2 !== 0) {
+      notFoundRes(res, 403, 'Email has already been taken')
+      return
     }
 
     await usersModel.insert(data)
@@ -135,6 +156,7 @@ const loginUsers = async (req, res, next) => {
     const { email, password } = req.body
     const { rows: [user] } = await usersModel.findByEmail(email)
     // const user = rows[0]
+    console.log(user)
     if (!user) {
       return response(res, null, 403, 'wrong email or password')
     }
@@ -143,11 +165,13 @@ const loginUsers = async (req, res, next) => {
     if (!validPassword) {
       return response(res, null, 403, 'wrong email or password')
     }
+
     delete user.user_password
 
     const payload = {
       email: user.email,
-      id: user.id
+      id: user.id,
+      role: 1
     }
     // generate token
     user.token = generateToken(payload)
@@ -160,8 +184,10 @@ const loginUsers = async (req, res, next) => {
 }
 
 const updateUsers = async (req, res, next) => {
-  const emailID = req.params.emailid
+  // const emailID = req.params.emailid
+  const emailID = req.decoded.email
   const { firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress } = req.body
+  const updatedAt = new Date()
 
   const data = {
     firstName,
@@ -172,7 +198,8 @@ const updateUsers = async (req, res, next) => {
     activationStatus,
     gender,
     birth,
-    userAddress
+    userAddress,
+    updatedAt
   }
 
   try {
@@ -180,7 +207,10 @@ const updateUsers = async (req, res, next) => {
     const result = parseInt(count.total)
 
     if (result === 0) {
-      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+      res.json({
+        message: 'invalid token'
+      })
+      return
     }
 
     await usersModel.updateProfile(data, emailID)

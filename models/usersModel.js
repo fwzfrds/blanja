@@ -48,7 +48,8 @@ const updateProfile = ({
   activationStatus,
   gender,
   birth,
-  userAddress
+  userAddress,
+  updatedAt
 }, emailID) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE users SET 
@@ -60,8 +61,9 @@ const updateProfile = ({
                 id_status = COALESCE($6, id_status),  
                 id_gender = COALESCE($7, id_gender),  
                 birth = COALESCE($8, birth),  
-                user_address = COALESCE($9, user_address) 
-                WHERE email = $10;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, emailID], (err, result) => {
+                user_address = COALESCE($9, user_address) ,
+                updated_at = COALESCE($10, updated_at) 
+                WHERE email = $11;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, updatedAt, emailID], (err, result) => {
       if (!err) {
         resolve(result)
       } else {

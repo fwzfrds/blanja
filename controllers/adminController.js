@@ -1,6 +1,10 @@
 const adminModel = require('../models/adminModel')
+const usersModel = require('../models/usersModel')
 const createError = require('http-errors')
+const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcryptjs')
 const { response, notFoundRes } = require('../helper/common')
+const { generateToken } = require('../helper/authHelper')
 const errorServer = new createError.InternalServerError()
 
 const getAdmins = async (req, res, next) => {
@@ -37,26 +41,102 @@ const getAdmins = async (req, res, next) => {
   }
 }
 
-const insertAdmin = async (req, res, next) => {
-  const { name, email, phone } = req.body
+const getAdminDetail = async (req, res, next) => {
+  // const email = req.params.emailid
+  const decode = req.decoded
+  console.log(decode)
+  const email = req.decoded.email
+  const { rows: [admin] } = await adminModel.findByEmail(email)
+
+  // if (admin === undefined) {
+  //   res.json({
+  //     message: 'invalid token'
+  //   })
+  //   return
+  // }
+
+  delete admin.password
+  response(res, admin, 200, 'Get Data success')
+}
+
+const registerAdmin = async (req, res, next) => {
+  const { name, email: emailID, password, phone } = req.body
+
+  const salt = bcrypt.genSaltSync(10)
+  const adminPassword = bcrypt.hashSync(password, salt)
 
   const data = {
+    id: uuidv4(),
     name,
-    email,
+    email: emailID,
+    adminPassword,
     phone
   }
 
   try {
+    // Check Email in users's table
+    const { rows: [count1] } = await usersModel.checkExisting(emailID)
+    const result1 = parseInt(count1.total)
+    console.log(result1)
+
+    // Check Email in admin's table
+    const { rows: [count2] } = await adminModel.checkByEmail(emailID)
+    const result2 = parseInt(count2.total)
+    console.log(result2)
+
+    if (result1 !== 0) {
+      notFoundRes(res, 403, 'Email has already been taken')
+      return
+    }
+
+    if (result2 !== 0) {
+      notFoundRes(res, 403, 'Email has already been taken')
+      return
+    }
+
     await adminModel.insert(data)
-    response(res, data, 201, 'Insert admin data success')
+    delete data.adminPassword
+    response(res, data, 201, 'Registration Succes')
   } catch (error) {
     console.log(error)
     next(errorServer)
   }
 }
 
+const loginAdmin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    const { rows: [admin] } = await adminModel.findByEmail(email)
+    // const user = rows[0]
+    console.log(admin)
+    if (!admin) {
+      return response(res, null, 403, 'wrong email or password')
+    }
+
+    const validPassword = bcrypt.compareSync(password, admin.password)
+    if (!validPassword) {
+      return response(res, null, 403, 'wrong email or password')
+    }
+    delete admin.password
+
+    const payload = {
+      email: admin.email,
+      id: admin.id,
+      role: 0
+    }
+    // generate token
+    admin.token = generateToken(payload)
+
+    response(res, admin, 200, 'Login Successful')
+  } catch (error) {
+    console.log(error)
+    next(new createError.InternalServerError())
+  }
+}
+
 const updateAdmin = async (req, res, next) => {
-  const id = req.params.id
+  // const id = req.params.id
+  const emailID = req.decoded.email
   const { name, email, phone } = req.body
   const updatedAt = new Date()
 
@@ -67,16 +147,20 @@ const updateAdmin = async (req, res, next) => {
     updatedAt
   }
 
+  // console.log(data)
+
   try {
-    const { rows: [count] } = await adminModel.checkExisting(id)
+    const { rows: [count] } = await adminModel.checkByEmail(emailID)
     const result = parseInt(count.total)
 
-    console.log(result)
     if (result === 0) {
-      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+      res.json({
+        message: 'invalid token'
+      })
+      return
     }
 
-    await adminModel.update(data, id)
+    await adminModel.update(data, emailID)
 
     response(res, data, 200, 'Admin data has just been updated')
   } catch (error) {
@@ -87,6 +171,8 @@ const updateAdmin = async (req, res, next) => {
 
 module.exports = {
   getAdmins,
-  insertAdmin,
-  updateAdmin
+  registerAdmin,
+  updateAdmin,
+  loginAdmin,
+  getAdminDetail
 }

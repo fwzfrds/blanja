@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const createError = require('http-errors')
+
 const authorizedUser = (req, res, next) => {
   try {
     let token
@@ -12,29 +13,61 @@ const authorizedUser = (req, res, next) => {
       req.decoded = decoded
       next()
     } else {
-      next(createError(400, 'server need token, please login'))
+      next(createError(400, 'server need token, please login!'))
     }
   } catch (error) {
-    console.log(error.name)
-    // console.log(error);
     if (error && error.name === 'JsonWebTokenError') {
       next(createError(400, 'token invalid'))
     } else if (error && error.name === 'TokenExpiredError') {
-      next(createError(400, 'token expired'))
+      next(createError(400, 'token expired, please login!'))
     } else {
-      next(createError(400, 'Token not active'))
+      next(createError(400, 'Token not active, please login!'))
     }
   }
 }
-const isAdmin = (req, res, next) => {
-  if (req.decoded.role !== 'admin') {
-    return next(createError(400, 'admin only'))
+
+const authorizedAdmin = (req, res, next) => {
+  try {
+    let token
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1]
+
+      const decoded = jwt.verify(token, process.env.SECRET_KEY_JWT)
+      // let decoded = jwt.verify(token, 'dsfasdfsdaf');
+      // console.log(decoded);
+      req.decoded = decoded
+      next()
+    } else {
+      next(createError(400, 'server need token, please login!'))
+    }
+  } catch (error) {
+    if (error && error.name === 'JsonWebTokenError') {
+      next(createError(400, 'token invalid'))
+    } else if (error && error.name === 'TokenExpiredError') {
+      next(createError(400, 'token expired, please login!'))
+    } else {
+      next(createError(400, 'Token not active, please login!'))
+    }
+  }
+}
+// const isAdmin = (req, res, next) => {
+// if (req.decoded.role !== 'admin') {
+//   return next(createError(400, 'admin only'))
+// }
+// next()
+// }
+const isUser = (req, res, next) => {
+  if (req.decoded.role !== 1) {
+    return next(createError(400, 'user only'))
   }
   next()
 }
+
 module.exports = {
   authorizedUser,
-  isAdmin
+  authorizedAdmin,
+  isUser
+  // isAdmin
 }
 
 // sampai sini terakhir lanjut besok ke authorization

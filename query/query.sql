@@ -2,7 +2,7 @@ CREATE TABLE users (id varchar(64) NOT NULL,
     first_name varchar(64) NOT NULL, 
     last_name varchar(64) NOT NULL, 
     email varchar(64) NOT NULL,
-    user_password varchar(64) NOT NULL, 
+    password varchar(64) NOT NULL, 
     phone varchar(64),
     id_status INT DEFAULT 0, 
     id_gender INT DEFAULT 0, 
@@ -36,10 +36,11 @@ CREATE TABLE categories(
 );
 
 CREATE TABLE admins(
-    id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+    id VARCHAR(64) NOT NULL,
     name VARCHAR(64) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone varchar(255),
+    email VARCHAR(64) NOT NULL,
+    password VARCHAR(64) NOT NULL,
+    phone varchar(64),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
