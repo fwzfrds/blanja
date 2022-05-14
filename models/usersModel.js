@@ -13,7 +13,7 @@ const select = ({ limit, offset }) => {
 
 const findByEmail = (email) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM users WHERE email = $1', [email], (error, result) => {
+    pool.query(`SELECT * FROM users WHERE email = '${email}';`, (error, result) => {
       if (!error) {
         resolve(result)
       } else {
@@ -39,19 +39,29 @@ const checkExisting = (emailID) => {
   return pool.query(`SELECT COUNT(*) AS total FROM users WHERE email = '${emailID}';`)
 }
 
-const update = ({ firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress }, emailID) => {
+const updateProfile = ({
+  firstName,
+  lastName,
+  email,
+  userPassword,
+  phone,
+  activationStatus,
+  gender,
+  birth,
+  userAddress
+}, emailID) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE users SET 
-                  first_name = COALESCE(${firstName}, first_name), 
-                  last_name = COALESCE(${lastName}, last_name), 
-                  email = COALESCE(${email}, email),
-                  user_password = COALESCE(${userPassword}, user_password), 
-                  phone = COALESCE(${phone}, phone), 
-                  id_status = COALESCE(${activationStatus}, id_status), 
-                  id_gender = COALESCE(${gender}, id_gender), 
-                  birth = COALESCE(${birth}, birth), 
-                  user_address = COALESCE(${userAddress}, user_address) 
-                  WHERE email = '${emailID}';`, (err, result) => {
+                first_name = COALESCE($1, first_name), 
+                last_name = COALESCE($2, last_name), 
+                email = COALESCE($3, email),  
+                user_password = COALESCE($4, user_password),  
+                phone = COALESCE($5, phone),  
+                id_status = COALESCE($6, id_status),  
+                id_gender = COALESCE($7, id_gender),  
+                birth = COALESCE($8, birth),  
+                user_address = COALESCE($9, user_address) 
+                WHERE email = $10;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, emailID], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -65,16 +75,19 @@ const countUser = () => {
   return pool.query('SELECT COUNT(*) AS total FROM users')
 }
 
-const deleteUsers = (id) => {
-  return pool.query('DELETE FROM users WHERE id = $1', [id])
+const deleteUsers = (emailid) => {
+  return pool.query('DELETE FROM users WHERE email = $1', [emailid])
 }
 
 module.exports = {
   select,
   insert,
   deleteUsers,
-  update,
+  updateProfile,
   countUser,
   checkExisting,
   findByEmail
 }
+
+// perbaiki masalah ini tadinay udah undefined dan teratasi oleh coalesce tapi ini value nya jadi undefined harusnya null
+// teakhir sampai sini pokoknya

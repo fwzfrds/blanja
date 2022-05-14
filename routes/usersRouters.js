@@ -5,15 +5,18 @@ const {
   insertUsers,
   updateUsers,
   deleteUsers,
-  getProfileDetail
+  getProfileDetail,
+  loginUsers
 } = require('../controllers/usersController')
+const { authorizedUser } = require('../middlewares/authMiddleware')
 
 //  ----> /users.....
 router
   .get('/', getUsers)
-  .get('/profile/:emailid', getProfileDetail)
-  .post('/', insertUsers)
+  .get('/profile/:emailid', authorizedUser, getProfileDetail)
+  .post('/registration', insertUsers)
+  .post('/login', loginUsers)
   .put('/:emailid', updateUsers)
-  .delete('/:id', deleteUsers)
+  .delete('/:emailid', deleteUsers)
 
 module.exports = router

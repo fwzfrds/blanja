@@ -109,6 +109,8 @@ const updateProduct = async (req, res, next) => {
     updatedAt
   }
 
+  console.log(data)
+
   try {
     const { rows: [count] } = await productsModel.checkExisting(id)
     const result = parseInt(count.total)
