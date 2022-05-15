@@ -53,7 +53,8 @@ const getProfileDetail = async (req, res, next) => {
   const decode = req.decoded
   console.log(decode)
   const email = req.decoded.email
-  const { rows: [user] } = await usersModel.findByEmail(email)
+  // const { rows: [user] } = await usersModel.findByEmail(email)
+  const { rows: [user] } = await usersModel.usersDetail(email)
 
   if (user === undefined) {
     res.json({
@@ -79,8 +80,8 @@ const insertUsers = async (req, res, next) => {
     email: emailID,
     userPassword,
     phone,
-    activationID: activationID || 0,
-    genderID: genderID || 0,
+    activationID: activationID || 1,
+    genderID: genderID || 1,
     birth,
     userAddress
   }
@@ -156,7 +157,7 @@ const loginUsers = async (req, res, next) => {
     const { email, password } = req.body
     const { rows: [user] } = await usersModel.findByEmail(email)
     // const user = rows[0]
-    console.log(user)
+
     if (!user) {
       return response(res, null, 403, 'wrong email or password')
     }
@@ -203,15 +204,12 @@ const updateUsers = async (req, res, next) => {
   }
 
   try {
-    const { rows: [count] } = await usersModel.checkExisting(emailID)
-    const result = parseInt(count.total)
+    // const { rows: [count] } = await usersModel.checkExisting(emailID)
+    // const result = parseInt(count.total)
 
-    if (result === 0) {
-      res.json({
-        message: 'invalid token'
-      })
-      return
-    }
+    // if (result === 0) {
+    //   return notFoundRes(res, 404, 'Data not found')
+    // }
 
     await usersModel.updateProfile(data, emailID)
 
@@ -249,3 +247,5 @@ module.exports = {
   getProfileDetail,
   loginUsers
 }
+
+// terakhir sampai sini

@@ -82,12 +82,6 @@ const insertProduct = async (req, res, next) => {
   try {
     await productsModel.insert(data)
 
-    // res.status(201).json({
-    //     status: 201,
-    //     message: 'insert data success',
-    //     data
-    // })
-
     response(res, data, 201, 'Insert product data success')
   } catch (error) {
     console.log(error)
@@ -109,14 +103,12 @@ const updateProduct = async (req, res, next) => {
     updatedAt
   }
 
-  console.log(data)
-
   try {
     const { rows: [count] } = await productsModel.checkExisting(id)
     const result = parseInt(count.total)
 
     if (result === 0) {
-      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+      return notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
     }
 
     await productsModel.update(data, id)

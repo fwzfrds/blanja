@@ -19,7 +19,7 @@ const getCategories = async (req, res, next) => {
     }
 
     if ((result.rows).length === 0) {
-      notFoundRes(res, 404, 'Data not found')
+      return notFoundRes(res, 404, 'Data not found')
     }
 
     const totalPage = Math.ceil(totalData / limit)
@@ -45,7 +45,7 @@ const detailCategory = async (req, res) => {
     // })
 
     if ((result.rows).length === 0) {
-      notFoundRes(res, 404, 'Data not found')
+      return notFoundRes(res, 404, 'Data not found')
     }
     response(res, result.rows[0], 200, 'Get data success')
   } catch (error) {
@@ -85,9 +85,8 @@ const updateCategory = async (req, res, next) => {
     const { rows: [count] } = await categoriesModel.checkExisting(id)
     const result = parseInt(count.total)
 
-    console.log(result)
     if (result === 0) {
-      notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+      return notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
     }
 
     await categoriesModel.update(data, id)
@@ -105,9 +104,8 @@ const deleteCategory = async (req, res, next) => {
     const { rows: [count] } = await categoriesModel.checkExisting(id)
     const result = parseInt(count.total)
 
-    console.log(result)
     if (result === 0) {
-      notFoundRes(res, 404, 'Data not found, you cannot delete data which is not exist')
+      return notFoundRes(res, 404, 'Data not found, you cannot delete data which is not exist')
     }
 
     await categoriesModel.deleteCategory(id)
@@ -125,5 +123,3 @@ module.exports = {
   updateCategory,
   deleteCategory
 }
-
-// terakhir sampai sini merubah response standard pada categories

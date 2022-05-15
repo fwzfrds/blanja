@@ -7,15 +7,15 @@ const {
   loginAdmin,
   getAdminDetail
 } = require('../controllers/adminController')
-const { authorizedAdmin } = require('../middlewares/authMiddleware')
+const { protect, isAdmin } = require('../middlewares/authMiddleware')
 
 //  ----> /admin.....
 router
   .get('/', getAdmins)
-  .get('/profile', authorizedAdmin, getAdminDetail)
+  .get('/profile', protect, isAdmin, getAdminDetail)
   .post('/registration', registerAdmin)
   .post('/login', loginAdmin)
-  .put('/edit', authorizedAdmin, updateAdmin)
+  .put('/edit', protect, isAdmin, updateAdmin)
 // .delete('/:id', categoriesController.deleteCategory)
 
 module.exports = router

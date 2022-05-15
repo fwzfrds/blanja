@@ -6,6 +6,8 @@ const productsRouters = require('./productsRouters')
 const adminRouters = require('./adminRouters')
 const cartRouters = require('./cartRouters')
 const transactionsRouters = require('./transactionsRouters')
+const activationRouters = require('./activationRouters')
+const genderRouters = require('./genderRouters')
 
 router
   .use('/users', usersRouters)
@@ -14,5 +16,7 @@ router
   .use('/cart', cartRouters)
   .use('/admin', adminRouters)
   .use('/transactions', transactionsRouters)
+  .use('/activation', activationRouters)
+  .use('/gender', genderRouters)
 
 module.exports = router

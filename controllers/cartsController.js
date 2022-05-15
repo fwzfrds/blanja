@@ -1,4 +1,5 @@
 const cartsModel = require('../models/cartsModel')
+const productsModel = require('../models/productsModel')
 const createError = require('http-errors')
 const { response, notFoundRes } = require('../helper/common')
 const errorServer = new createError.InternalServerError()
@@ -9,7 +10,7 @@ const getCarts = async (req, res, next) => {
     let limit = parseInt(req.query.limit) || 4
     const offset = (page - 1) * limit
 
-    const id = req.params.id
+    const id = req.decoded.id
 
     const result = await cartsModel.select({ limit, offset, id })
 
@@ -21,7 +22,7 @@ const getCarts = async (req, res, next) => {
     }
 
     if ((result.rows).length === 0) {
-      notFoundRes(res, 404, 'Data not found')
+      return notFoundRes(res, 404, 'Your cart is empty, let\'s go shopping')
     }
 
     const totalPage = Math.ceil(totalData / limit)
@@ -40,22 +41,57 @@ const getCarts = async (req, res, next) => {
 }
 
 const insertCart = async (req, res, next) => {
-  const { idUser, idProduct, qty } = req.body
+  const { idProduct, qty: productQty } = req.body
+  const id = req.decoded.id
+
+  // dummy body for update qty after product add to qty
+  const { name, description, qty, price, idCategory } = req.body
+  const updatedAt = new Date()
 
   const data = {
-    idUser,
+    idUser: id,
     idProduct,
-    qty
+    productQty
+  }
+
+  const dummyData = {
+    name,
+    description,
+    qty,
+    price,
+    idCategory,
+    updatedAt
   }
 
   try {
+    // untuk cek apakah prduct tersebut sudah ada di dalam cart atau belum
+    const { rows: [count] } = await cartsModel.checkExisting(idProduct)
+    const result = parseInt(count.total)
+    // jika sudah maka
+    if (result !== 0) {
+      return notFoundRes(res, 403, 'The product is already in your shopping cart')
+    }
+
+    // Untuk dapatkan qty product yang di tambahkan ke dalam cart
+    const { rows: [qtyCount] } = await productsModel.getProductQty(idProduct)
+    console.log(qtyCount)
+    const currentQty = parseInt(qtyCount.qty)
+
+    // Jika qty productnya 0 maka kasih tau product sudah habis stocknya
+    if (currentQty === 0) {
+      return notFoundRes(res, 403, 'The product is out of stock')
+    } else if (productQty > currentQty) {
+      return notFoundRes(res, 403, 'Stock of this product is less than the amount you want')
+    }
+
+    // Tapi jika masih ada maka
+    dummyData.qty = currentQty - productQty
+
+    await productsModel.qtyUpdateFromCart(dummyData, idProduct)
+
     await cartsModel.insert(data)
 
-    res.status(201).json({
-      status: 201,
-      message: 'insert data success',
-      data
-    })
+    response(res, data, 200, 'The product has been added to your cart')
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -63,9 +99,10 @@ const insertCart = async (req, res, next) => {
 }
 
 const updateCartQty = async (req, res, next) => {
-  const idUserParams = req.params.id
+  const idUserToken = req.decoded.id
+  console.log(idUserToken)
+  const idCart = req.params.id
   const { idUser, idProduct, qty } = req.body
-  const { idproduct: idProductQuery } = req.query
   const updatedAt = new Date()
 
   const data = {
@@ -73,16 +110,19 @@ const updateCartQty = async (req, res, next) => {
     idProduct,
     qty,
     updatedAt,
-    idProductQuery
+    idCart
   }
 
   try {
-    await cartsModel.update(data, idUserParams)
-    res.status(200).json({
-      status: 200,
-      message: 'Product Data updated successfully',
-      data
-    })
+    const { rows: [count] } = await cartsModel.checkExisting(idCart)
+    const result = parseInt(count.total)
+
+    if (result === 0) {
+      return notFoundRes(res, 403, 'Data not found, you cannot edit the data which is not exist')
+    }
+
+    await cartsModel.update(data, idUserToken)
+    response(res, data, 200, 'Cart data successfully updated')
   } catch (error) {
     console.log(error)
     next(errorServer)
@@ -110,4 +150,9 @@ module.exports = {
   updateCartQty
 }
 
-// terakhir sampai sini
+/*
+  kemungkinan bug yang akan ada setelah ini:
+  pada perubahan stock jika ternyata user mengurangi atau menambah jumlah product yang ada pada cart
+  perbaiki nanti jika tugas sudah selesai
+
+*/

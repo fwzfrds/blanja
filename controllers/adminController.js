@@ -42,18 +42,8 @@ const getAdmins = async (req, res, next) => {
 }
 
 const getAdminDetail = async (req, res, next) => {
-  // const email = req.params.emailid
-  const decode = req.decoded
-  console.log(decode)
   const email = req.decoded.email
   const { rows: [admin] } = await adminModel.findByEmail(email)
-
-  // if (admin === undefined) {
-  //   res.json({
-  //     message: 'invalid token'
-  //   })
-  //   return
-  // }
 
   delete admin.password
   response(res, admin, 200, 'Get Data success')
@@ -147,18 +137,9 @@ const updateAdmin = async (req, res, next) => {
     updatedAt
   }
 
-  // console.log(data)
-
   try {
-    const { rows: [count] } = await adminModel.checkByEmail(emailID)
-    const result = parseInt(count.total)
-
-    if (result === 0) {
-      res.json({
-        message: 'invalid token'
-      })
-      return
-    }
+    // const { rows: [count] } = await adminModel.checkByEmail(emailID)
+    // const result = parseInt(count.total)
 
     await adminModel.update(data, emailID)
 

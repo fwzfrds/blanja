@@ -50,6 +50,37 @@ const update = ({ name, description, qty, price, idCategory, updatedAt }, id) =>
   })
 }
 
+const getProductQty = (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(`SELECT products.qty FROM products WHERE id = ${id};`, (err, result) => {
+      if (!err) {
+        resolve(result)
+      } else {
+        reject(new Error(err))
+      }
+    })
+  })
+}
+
+const qtyUpdateFromCart = ({ name, description, qty, price, idCategory, updatedAt }, idProduct) => {
+  return new Promise((resolve, reject) => {
+    pool.query(`UPDATE products SET 
+            name = COALESCE($1, name), 
+            description = COALESCE($2, description), 
+            qty = COALESCE($3, qty), 
+            price = COALESCE($4, price), 
+            id_category = COALESCE($5, id_category), 
+            updated_at = COALESCE($6, updated_at)
+            WHERE id = $7;`, [name, description, qty, price, idCategory, updatedAt, idProduct], (err, result) => {
+      if (!err) {
+        resolve(result)
+      } else {
+        reject(new Error(err))
+      }
+    })
+  })
+}
+
 const checkExisting = (id) => {
   return pool.query(`SELECT COUNT(*) AS total FROM products WHERE id = ${id}`)
 }
@@ -65,5 +96,7 @@ module.exports = {
   insert,
   update,
   checkExisting,
-  deleteProduct
+  deleteProduct,
+  qtyUpdateFromCart,
+  getProductQty
 }
