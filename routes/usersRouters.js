@@ -6,13 +6,15 @@ const {
   updateUsers,
   deleteUsers,
   getProfileDetail,
-  loginUsers
+  loginUsers,
+  userActivate
 } = require('../controllers/usersController')
-const { protect, isUser } = require('../middlewares/authMiddleware')
+const { protect, isUser, isTokenValid } = require('../middlewares/authMiddleware')
 
 //  ----> /users.....
 router
   .get('/', getUsers)
+  .get('/active/:token', isTokenValid, userActivate)
   .get('/profile', protect, isUser, getProfileDetail)
   .post('/registration', insertUsers)
   .post('/login', loginUsers)

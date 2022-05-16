@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs')
 // const jwt = require('jsonwebtoken')
 const { response, notFoundRes } = require('../helper/common')
 const { generateToken } = require('../helper/authHelper')
+const { sendEmail } = require('../helper/emailActivation')
 
 const errorServer = new createError.InternalServerError()
 
@@ -104,6 +105,8 @@ const insertUsers = async (req, res, next) => {
       return
     }
 
+    sendEmail(emailID)
+
     await usersModel.insert(data)
     delete data.userPassword
     response(res, data, 201, 'Register Success')
@@ -184,6 +187,37 @@ const loginUsers = async (req, res, next) => {
   }
 }
 
+const userActivate = async (req, res, next) => {
+  try {
+    const emailID = req.decoded.email
+    console.log(emailID)
+    const { firstName, lastName, email, userPassword, phone, gender, birth, userAddress } = req.body
+    const activatedAt = new Date()
+
+    const data = {
+      firstName,
+      lastName,
+      email,
+      userPassword,
+      phone,
+      activationStatus: 2,
+      gender,
+      birth,
+      userAddress,
+      activatedAt
+    }
+
+    console.log(data)
+
+    await usersModel.activateStatus(data, emailID)
+
+    response(res, activatedAt, 200, 'Congrats ! your account has been activated')
+  } catch (error) {
+    console.log(error)
+    next(new createError.InternalServerError())
+  }
+}
+
 const updateUsers = async (req, res, next) => {
   // const emailID = req.params.emailid
   const emailID = req.decoded.email
@@ -245,7 +279,8 @@ module.exports = {
   deleteUsers,
   updateUsers,
   getProfileDetail,
-  loginUsers
+  loginUsers,
+  userActivate
 }
 
 // terakhir sampai sini
