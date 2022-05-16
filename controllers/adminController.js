@@ -98,7 +98,6 @@ const loginAdmin = async (req, res, next) => {
     const { email, password } = req.body
     const { rows: [admin] } = await adminModel.findByEmail(email)
     // const user = rows[0]
-    console.log(admin)
     if (!admin) {
       return response(res, null, 403, 'wrong email or password')
     }

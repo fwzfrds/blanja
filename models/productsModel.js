@@ -19,9 +19,9 @@ const countProducts = () => {
   return pool.query('SELECT COUNT(*) AS total FROM products')
 }
 
-const insert = ({ name, description, qty, price, idCategory }) => {
+const insert = ({ name, description, qty, price, idCategory, photo }) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO products(name, description, qty, price, id_category)VALUES($1, $2, $3, $4, $5)', [name, description, qty, price, idCategory], (err, result) => {
+    pool.query('INSERT INTO products(name, description, qty, price, id_category, image)VALUES($1, $2, $3, $4, $5, $6)', [name, description, qty, price, idCategory, photo], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -31,7 +31,7 @@ const insert = ({ name, description, qty, price, idCategory }) => {
   })
 }
 
-const update = ({ name, description, qty, price, idCategory, updatedAt }, id) => {
+const update = ({ name, description, qty, price, idCategory, photo, updatedAt }, id) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE products SET 
             name = COALESCE($1, name), 
@@ -39,8 +39,9 @@ const update = ({ name, description, qty, price, idCategory, updatedAt }, id) =>
             qty = COALESCE($3, qty), 
             price = COALESCE($4, price), 
             id_category = COALESCE($5, id_category), 
-            updated_at = COALESCE($6, updated_at)
-            WHERE id = $7;`, [name, description, qty, price, idCategory, updatedAt, id], (err, result) => {
+            image = COALESCE($6, image), 
+            updated_at = COALESCE($7, updated_at)
+            WHERE id = $8;`, [name, description, qty, price, idCategory, photo, updatedAt, id], (err, result) => {
       if (!err) {
         resolve(result)
       } else {

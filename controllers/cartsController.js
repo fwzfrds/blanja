@@ -65,8 +65,9 @@ const insertCart = async (req, res, next) => {
 
   try {
     // untuk cek apakah prduct tersebut sudah ada di dalam cart atau belum
-    const { rows: [count] } = await cartsModel.checkExisting(idProduct)
+    const { rows: [count] } = await cartsModel.checkByProduct(idProduct, id)
     const result = parseInt(count.total)
+
     // jika sudah maka
     if (result !== 0) {
       return notFoundRes(res, 403, 'The product is already in your shopping cart')
@@ -100,7 +101,6 @@ const insertCart = async (req, res, next) => {
 
 const updateCartQty = async (req, res, next) => {
   const idUserToken = req.decoded.id
-  console.log(idUserToken)
   const idCart = req.params.id
   const { idUser, idProduct, qty } = req.body
   const updatedAt = new Date()
@@ -121,7 +121,12 @@ const updateCartQty = async (req, res, next) => {
       return notFoundRes(res, 403, 'Data not found, you cannot edit the data which is not exist')
     }
 
-    await cartsModel.update(data, idUserToken)
+    const { rowCount } = await cartsModel.update(data, idUserToken)
+
+    if (rowCount === 0) {
+      return notFoundRes(res, 403, 'Data not found, you cannot delete the data which is not exist')
+    }
+
     response(res, data, 200, 'Cart data successfully updated')
   } catch (error) {
     console.log(error)
@@ -129,14 +134,28 @@ const updateCartQty = async (req, res, next) => {
   }
 }
 
-const deleteCart = (req, res, next) => {
-  const id = req.params.id
+const deleteCart = async (req, res, next) => {
+  const idCart = req.params.id
+  const idUser = req.decoded.id
+
+  console.log(idUser)
+  console.log(idCart)
 
   try {
-    cartsModel.deleteCart(id)
-    res.json({
-      message: 'Delete data success'
-    })
+    const { rows: [count] } = await cartsModel.checkExisting(idCart)
+    const result = parseInt(count.total)
+
+    if (result === 0) {
+      return notFoundRes(res, 403, 'Data not found, you cannot delete the data which is not exist')
+    }
+
+    const { rowCount } = await cartsModel.deleteCart(idCart, idUser)
+
+    if (rowCount === 0) {
+      return notFoundRes(res, 403, 'Data not found, you cannot delete the data which is not exist')
+    }
+
+    response(res, idCart, 200, 'Cart data has been deleted')
   } catch (error) {
     console.log(error)
     next(errorServer)

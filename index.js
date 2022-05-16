@@ -8,6 +8,7 @@ const createError = require('http-errors')
 const morgan = require('morgan')
 const helmet = require('helmet')
 const xss = require('xss-clean')
+const path = require('path')
 
 const mainRoute = require('./routes')
 // const midCors = require('./middlewares/cors')
@@ -15,6 +16,7 @@ const mainRoute = require('./routes')
 const PORT = process.env.PORT || 5000
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 app.use(morgan('dev'))
 app.use(helmet())
@@ -29,6 +31,7 @@ app.use('/v1', mainRoute)
 // app.use('/admin', adminRouters)
 // app.use('/transactions', transactionsRouters)
 
+app.use('/img', express.static(path.join(__dirname, '/upload')))
 app.all('*', (req, res, next) => {
   // Cara 1 : bawaan package
   next(new createError.NotFound())

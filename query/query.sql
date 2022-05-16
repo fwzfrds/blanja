@@ -80,6 +80,7 @@ CREATE TABLE products(
     qty INT DEFAULT 0,
     price INT DEFAULT 0,
     id_category INT,
+    image VARCHAR(128),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY(id)

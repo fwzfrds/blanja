@@ -4,6 +4,7 @@ const select = ({ limit, offset, id }) => {
   return new Promise((resolve, reject) => {
     pool.query(`SELECT products.name AS name_product,
                     products.price AS price_product,
+                    products.image AS product_image,
                     carts.qty
                     FROM carts INNER JOIN products 
                     ON carts.id_product = products.id
@@ -42,6 +43,10 @@ const checkExisting = (idCart) => {
   return pool.query(`SELECT COUNT(*) AS total FROM carts WHERE id = ${idCart}`)
 }
 
+const checkByProduct = (idProduct, id) => {
+  return pool.query(`SELECT COUNT(*) AS total FROM carts WHERE id_product = ${idProduct} AND id_user = '${id}'`)
+}
+
 const update = ({ idUser, idProduct, qty, updatedAt, idCart }, idUserToken) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE carts SET 
@@ -59,8 +64,8 @@ const update = ({ idUser, idProduct, qty, updatedAt, idCart }, idUserToken) => {
   })
 }
 
-const deleteCart = (id) => {
-  return pool.query('DELETE FROM carts WHERE id = $1', [id])
+const deleteCart = (idCart, idUser) => {
+  return pool.query(`DELETE FROM carts WHERE id = ${idCart} AND id_user = '${idUser}'`)
 }
 
 module.exports = {
@@ -70,5 +75,6 @@ module.exports = {
   deleteCart,
   update,
   checkExisting,
-  checkById
+  checkById,
+  checkByProduct
 }

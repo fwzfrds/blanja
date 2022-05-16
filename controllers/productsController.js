@@ -69,17 +69,28 @@ const detailProduct = async (req, res) => {
 }
 
 const insertProduct = async (req, res, next) => {
+  console.log(req.file)
   const { name, description, qty, price, idCategory } = req.body
+  let photo
+
+  if (req.file !== undefined) {
+    photo = `http://${req.get('host')}/img/${req.file.filename}`
+  }
 
   const data = {
     name,
     description,
     qty,
     price,
-    idCategory
+    idCategory,
+    photo
   }
 
   try {
+    // res.json({
+    //   message: 'upload berhasil',
+    //   data
+    // })
     await productsModel.insert(data)
 
     response(res, data, 201, 'Insert product data success')
@@ -91,8 +102,14 @@ const insertProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   const id = req.params.id
+  console.log(req.file)
   const { name, description, qty, price, idCategory } = req.body
   const updatedAt = new Date()
+  let photo
+
+  if (req.file !== undefined) {
+    photo = `http://${req.get('host')}/img/${req.file.filename}`
+  }
 
   const data = {
     name,
@@ -100,6 +117,7 @@ const updateProduct = async (req, res, next) => {
     qty,
     price,
     idCategory,
+    photo,
     updatedAt
   }
 
@@ -133,15 +151,11 @@ const deleteProduct = async (req, res, next) => {
 
     const result = parseInt(count.total)
 
-    console.log(result)
     if (result === 0) {
       notFoundRes(res, 404, 'Data not found, you cannot delete the data which is not exist')
     }
 
-    await productsModel.deleteProduct(id)
-    // res.json({
-    //     message: 'Delete data success'
-    // })
+    productsModel.deleteProduct(id)
 
     response(res, id, 200, 'Delete data success')
   } catch (error) {
