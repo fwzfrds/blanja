@@ -38,7 +38,7 @@ const getUsers = async (req, res, next) => {
     }
 
     for (let i = 0; i < totalData; i++) {
-      console.log(result.rows[i].user_password)
+      // console.log(result.rows[i].user_password)
       delete result.rows[i].user_password
     }
 
@@ -88,10 +88,10 @@ const insertUsers = async (req, res, next) => {
   }
 
   try {
-    // Check Email in users's table
+    // Check Email in users table
     const { rows: [count1] } = await usersModel.checkExisting(emailID)
     const result1 = parseInt(count1.total)
-    // Check Email in admin's table
+    // Check Email in admin table
     const { rows: [count2] } = await adminModel.checkByEmail(emailID)
     const result2 = parseInt(count2.total)
 
@@ -112,47 +112,8 @@ const insertUsers = async (req, res, next) => {
     response(res, data, 201, 'Register Success')
   } catch (error) {
     console.log(error)
-    // Cara 4 : menggunakan package
-    // a. menggunakan custom status & message
-    // next(createError(500, 'Ada error di input anda'))
-    // b. menggunakan status & message bawaan
-    // next(new createError.InternalServerError())
     next(errorServer)
-
-    // Cara 1
-    // const error = new Error('Insert User Error!')
-    // error.status = 500
-    // next(error)
-
-    // Cara 2
-    // next({ message: 'Insert User Error!', status: 500 })
-
-    // Cara 3
-    // res.status(500).json({
-    //     message: "internal server error"
-    // })
   }
-
-  // usersModel.insert(data)
-  //     .then(() => {
-  //         res.status(200).json({
-  //             message: 'insert data success',
-  //             data
-  //         })
-  //     })
-  //     .catch((error) => {
-  //         console.log(error)
-  // next(errorServ)
-  // cara 1
-  //   const error = new Error('ada error id insert cateogry')
-  //   error.status = 500
-  //   next(error)
-  // cara 2
-  // next({message: 'ada error bro', status: 500})
-  // cara 3
-  //   next(createError(500, 'ada error di input anda'))
-  //   next(new createError.NotFound())
-  // })
 }
 
 const loginUsers = async (req, res, next) => {
@@ -172,10 +133,13 @@ const loginUsers = async (req, res, next) => {
 
     delete user.user_password
 
+    console.log(user)
+
     const payload = {
       email: user.email,
       id: user.id,
-      role: 1
+      role: 1,
+      status: user.id_status
     }
     // generate token
     user.token = generateToken(payload)

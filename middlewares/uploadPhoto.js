@@ -10,10 +10,7 @@ const storage = multer.diskStorage({
   }
 })
 
-// const upload = multer({ storage })
-const maxSize = 1 * 1024 * 1024 // 1mb
-const sizeInMb = maxSize / 1024 / 1024
-console.log(sizeInMb)
+const maxSize = 2 * 1024 * 1024 // 2mb
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {

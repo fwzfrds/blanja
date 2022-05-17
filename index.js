@@ -24,13 +24,6 @@ app.use(xss())
 
 app.use('/v1', mainRoute)
 
-// app.use('/users', usersRouters)
-// app.use('/categories', categoriesRouters)
-// app.use('/products', productsRouters)
-// app.use('/cart', cartRouters)
-// app.use('/admin', adminRouters)
-// app.use('/transactions', transactionsRouters)
-
 app.use('/img', express.static(path.join(__dirname, '/upload')))
 app.all('*', (req, res, next) => {
   // Cara 1 : bawaan package
@@ -44,14 +37,17 @@ app.all('*', (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-  const errorMessage = err.message || 'internal server error'
+  let errorMessage = err.message || 'internal server error'
   const statusCode = err.status || 500
+
+  if (errorMessage === 'File too large') {
+    errorMessage = 'File must be under 2MB'
+  }
 
   res.status(statusCode).json({
     status: statusCode,
     message: errorMessage
   })
-  // console.log(err);
 })
 
 app.listen(PORT, () => {

@@ -19,5 +19,3 @@ router
   .delete('/:id', protect, isAdmin, deleteProduct)
 
 module.exports = router
-
-// lanjut besok tangani validasi format file

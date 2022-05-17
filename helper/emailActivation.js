@@ -7,8 +7,8 @@ const sendEmail = async (email) => {
       port: 465,
       secure: true, // true for 465, false for other ports
       auth: {
-        user: 'fawwaz.pijarcamp@gmail.com', // generated ethereal user
-        pass: 'fawwazpijarcamp2' // generated ethereal password
+        user: process.env.EMAIL_FOR_SENDEMAIL, // generated ethereal user
+        pass: process.env.PASS_SEND_EMAIL // generated ethereal password
       }
     })
     const token = jwt.sign({ email }, process.env.SECRET_KEY_JWT, {
@@ -66,3 +66,5 @@ const sendEmail = async (email) => {
 module.exports = {
   sendEmail
 }
+
+// Terakhir sampai menambahkan aktivasi via email
