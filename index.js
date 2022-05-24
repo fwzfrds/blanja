@@ -41,7 +41,11 @@ app.use((err, req, res, next) => {
   const statusCode = err.status || 500
 
   if (errorMessage === 'File too large') {
-    errorMessage = 'File must be under 2MB'
+    errorMessage = 'File must be under 2mb'
+  }
+
+  if (errorMessage === 'Unexpected field') {
+    errorMessage = 'The number of files you entered is over the limit'
   }
 
   res.status(statusCode).json({

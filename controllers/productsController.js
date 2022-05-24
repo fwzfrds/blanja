@@ -69,13 +69,23 @@ const detailProduct = async (req, res) => {
 }
 
 const insertProduct = async (req, res, next) => {
-  console.log(req.file)
+  console.log(req.files[0].filename)
   const { name, description, qty, price, idCategory } = req.body
-  let photo
+  const photo = []
 
-  if (req.file !== undefined) {
-    photo = `http://${req.get('host')}/img/${req.file.filename}`
+  // upload single image
+  //   if (req.file !== undefined) {
+  //     photo = `http://${req.get('host')}/img/${req.file.filename}`
+  //   }
+
+  // upload multiple images
+  if (req.files) {
+    req.files.forEach(item => {
+      photo.push(`http://${req.get('host')}/img/${item.filename}`)
+    })
   }
+
+  console.log(photo)
 
   const data = {
     name,
@@ -87,10 +97,6 @@ const insertProduct = async (req, res, next) => {
   }
 
   try {
-    // res.json({
-    //   message: 'upload berhasil',
-    //   data
-    // })
     await productsModel.insert(data)
 
     response(res, data, 201, 'Insert product data success')
@@ -102,13 +108,26 @@ const insertProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   const id = req.params.id
-  console.log(req.file)
+  console.log((req.files).length)
   const { name, description, qty, price, idCategory } = req.body
   const updatedAt = new Date()
-  let photo
+  let photo = []
 
-  if (req.file !== undefined) {
-    photo = `http://${req.get('host')}/img/${req.file.filename}`
+  // upload single image
+  //   if (req.file !== undefined) {
+  //     photo = `http://${req.get('host')}/img/${req.file.filename}`
+  //   }
+
+  // untuk mengatasi apabila gambar tidak diupdate supaya tidak jadi kosong
+  if ((req.files).length === 0) {
+    photo = undefined
+  }
+
+  // upload multiple images
+  if (req.files) {
+    req.files.forEach(item => {
+      photo.push(`http://${req.get('host')}/img/${item.filename}`)
+    })
   }
 
   const data = {
@@ -129,12 +148,9 @@ const updateProduct = async (req, res, next) => {
       return notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
     }
 
+    // perbaiki dibagian ini, pas data not found tapi gambar masih terupload
+
     await productsModel.update(data, id)
-    // res.status(200).json({
-    //     status: 200,
-    //     message: 'Product Data updated successfully',
-    //     data
-    // })
 
     response(res, data, 200, 'Update data success')
   } catch (error) {

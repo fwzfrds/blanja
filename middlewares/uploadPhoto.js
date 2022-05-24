@@ -22,6 +22,9 @@ const upload = multer({
     }
   },
   limits: { fileSize: maxSize }
-}).single('photo')
+})
+// const upload = multer({ storage })
+
+// const multipleUpload = upload.fields([{ name: 'image', maxCount: 3 }])
 
 module.exports = upload

@@ -3,9 +3,9 @@ const adminModel = require('../models/adminModel')
 const createError = require('http-errors')
 const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcryptjs')
-// const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 const { response, notFoundRes } = require('../helper/common')
-const { generateToken } = require('../helper/authHelper')
+const { generateToken, generateRefreshToken } = require('../helper/authHelper')
 const { sendEmail } = require('../helper/emailActivation')
 
 const errorServer = new createError.InternalServerError()
@@ -143,12 +143,34 @@ const loginUsers = async (req, res, next) => {
     }
     // generate token
     user.token = generateToken(payload)
+    user.RefreshToken = generateRefreshToken(payload)
 
     response(res, user, 200, 'Login Successful')
   } catch (error) {
     console.log(error)
     next(new createError.InternalServerError())
   }
+}
+
+const refreshToken = (req, res, next) => {
+  const refreshToken = req.body.refreshToken
+  const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_JWT_2)
+
+  const payload = {
+    email: decoded.email,
+    id: decoded.id,
+    role: 1,
+    status: decoded.id_status
+  }
+
+  const result = {
+    token: generateToken(payload),
+    refreshToken: generateRefreshToken(payload)
+  }
+
+  response(res, result, 200, 'Login Successful')
+
+  // return console.log(decoded)
 }
 
 const userActivate = async (req, res, next) => {
@@ -244,7 +266,8 @@ module.exports = {
   updateUsers,
   getProfileDetail,
   loginUsers,
-  userActivate
+  userActivate,
+  refreshToken
 }
 
 // terakhir sampai sini

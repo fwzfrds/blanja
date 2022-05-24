@@ -7,7 +7,8 @@ const {
   deleteUsers,
   getProfileDetail,
   loginUsers,
-  userActivate
+  userActivate,
+  refreshToken
 } = require('../controllers/usersController')
 const { protect, isUser, isTokenValid } = require('../middlewares/authMiddleware')
 
@@ -18,6 +19,7 @@ router
   .get('/profile', protect, isUser, getProfileDetail)
   .post('/registration', insertUsers)
   .post('/login', loginUsers)
+  .post('/refresh-token', refreshToken)
   .put('/edit', protect, isUser, updateUsers)
   .delete('/:emailid', deleteUsers)
 
