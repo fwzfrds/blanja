@@ -59,7 +59,7 @@ const getProfileDetail = async (req, res, next) => {
 
   if (user === undefined) {
     res.json({
-      messgae: 'invalid token'
+      message: 'invalid token'
     })
     return
   }
