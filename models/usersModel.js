@@ -13,7 +13,7 @@ const select = ({ limit, offset }) => {
 
 const usersDetail = (email) => {
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT users.*, activation.activation_status, gender.gender_name FROM users INNER JOIN activation ON users.id_status = activation.id INNER JOIN gender ON users.id_gender = gender.id WHERE users.email = '${email}';`, (error, result) => {
+    pool.query(`SELECT users.*, activation.activation_name, gender.gender_name FROM users INNER JOIN activation ON users.id_status = activation.id INNER JOIN gender ON users.id_gender = gender.id WHERE users.email = '${email}';`, (error, result) => {
       if (!error) {
         resolve(result)
       } else {
