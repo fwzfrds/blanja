@@ -50,7 +50,7 @@ const sendEmail = async (email) => {
         </head>
         <body>
             <div class="container">
-                <a href="http://localhost:5000/v1/users/active/${token}">klik aktif</a>
+                <a href="https://blanja-web-api.herokuapp.com/v1/users/active/${token}">klik aktif</a>
             </div>
         </body>
         </html>` // html body
