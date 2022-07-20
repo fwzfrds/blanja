@@ -55,6 +55,8 @@ const registerAdmin = async (req, res, next) => {
   const salt = bcrypt.genSaltSync(10)
   const adminPassword = bcrypt.hashSync(password, salt)
 
+  console.log(adminPassword)
+
   const data = {
     id: uuidv4(),
     name,
@@ -62,6 +64,8 @@ const registerAdmin = async (req, res, next) => {
     adminPassword,
     phone
   }
+
+  console.log(data)
 
   try {
     // Check Email in users's table
@@ -115,6 +119,7 @@ const loginAdmin = async (req, res, next) => {
     }
     // generate token
     admin.token = generateToken(payload)
+    admin.role = 'admin'
 
     response(res, admin, 200, 'Login Successful')
   } catch (error) {

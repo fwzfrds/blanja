@@ -5,31 +5,33 @@ const errorServer = new createError.InternalServerError()
 
 const getCategories = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1
-    let limit = parseInt(req.query.limit) || 4
-    const offset = (page - 1) * limit
+    // const page = parseInt(req.query.page) || 1
+    // let limit = parseInt(req.query.limit) || 4
+    // const offset = (page - 1) * limit
 
-    const result = await categoriesModel.select({ limit, offset })
+    // const result = await categoriesModel.select({ limit, offset })
+    const result = await categoriesModel.select()
 
-    const { rows: [count] } = await categoriesModel.countCategories()
-    const totalData = parseInt(count.total)
+    // const { rows: [count] } = await categoriesModel.countCategories()
+    // const totalData = parseInt(count.total)
 
-    if (totalData < limit) {
-      limit = totalData
-    }
+    // if (totalData < limit) {
+    //   limit = totalData
+    // }
 
     if ((result.rows).length === 0) {
       return notFoundRes(res, 404, 'Data not found')
     }
 
-    const totalPage = Math.ceil(totalData / limit)
-    const pagination = {
-      currentPage: page,
-      dataPerPage: limit,
-      totalData,
-      totalPage
-    }
-    response(res, result.rows, 200, 'Get data success', pagination)
+    // const totalPage = Math.ceil(totalData / limit)
+    // const pagination = {
+    //   currentPage: page,
+    //   dataPerPage: limit,
+    //   totalData,
+    //   totalPage
+    // }
+    // response(res, result.rows, 200, 'Get data success', pagination)
+    response(res, result.rows, 200, 'Get data success')
   } catch (error) {
     console.log(error)
     next(errorServer)

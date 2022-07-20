@@ -144,6 +144,7 @@ const loginUsers = async (req, res, next) => {
     // generate token
     user.token = generateToken(payload)
     user.RefreshToken = generateRefreshToken(payload)
+    user.role = 'user'
 
     response(res, user, 200, 'Login Successful')
   } catch (error) {

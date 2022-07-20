@@ -12,6 +12,7 @@ const select = ({ limit, offset, sortBy, sortOrder, search }) => {
 }
 
 const getProductById = (id) => {
+  console.log(id)
   return pool.query('SELECT products.*, categories.name AS name_category FROM products INNER JOIN categories ON products.id_category = categories.id WHERE products.id = $1', [id])
 }
 
@@ -19,9 +20,9 @@ const countProducts = () => {
   return pool.query('SELECT COUNT(*) AS total FROM products')
 }
 
-const insert = ({ name, description, qty, price, idCategory, photo }) => {
+const insert = ({ name, description, qty, price, idCategory, photos, condition }) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO products(name, description, qty, price, id_category, image)VALUES($1, $2, $3, $4, $5, $6)', [name, description, qty, price, idCategory, photo], (err, result) => {
+    pool.query('INSERT INTO products(name, description, qty, price, id_category, image, condition)VALUES($1, $2, $3, $4, $5, $6, $7)', [name, description, qty, price, idCategory, photos, condition], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -31,7 +32,7 @@ const insert = ({ name, description, qty, price, idCategory, photo }) => {
   })
 }
 
-const update = ({ name, description, qty, price, idCategory, photo, updatedAt }, id) => {
+const update = ({ name, description, qty, price, idCategory, photos, updatedAt }, id) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE products SET 
             name = COALESCE($1, name), 
@@ -41,7 +42,7 @@ const update = ({ name, description, qty, price, idCategory, photo, updatedAt },
             id_category = COALESCE($5, id_category), 
             image = COALESCE($6, image), 
             updated_at = COALESCE($7, updated_at)
-            WHERE id = $8;`, [name, description, qty, price, idCategory, photo, updatedAt, id], (err, result) => {
+            WHERE id = $8;`, [name, description, qty, price, idCategory, photos, updatedAt, id], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
