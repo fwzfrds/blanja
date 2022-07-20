@@ -136,61 +136,49 @@ const insertProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   const id = req.params.id
-  console.log((req.files).length)
-  const { name, description, qty, price, idCategory } = req.body
+  // console.log((req.files).length)
+  const { name, description, qty, price, idCategory, condition } = req.body
   const updatedAt = new Date()
-  let photo = []
-  let photos
+  const photo = []
 
-  // upload single image
-  //   if (req.file !== undefined) {
-  //     photo = `http://${req.get('host')}/img/${req.file.filename}`
-  //   }
+  const { rows: [count] } = await productsModel.checkExisting(id)
+  const result = parseInt(count.total)
 
-  // untuk mengatasi apabila gambar tidak diupdate supaya tidak jadi kosong
-  if ((req.files).length === 0) {
-    photo = undefined
+  if (result === 0) {
+    return notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
   }
 
   // upload multiple images
-  if (req.files) {
-    req.files.forEach(item => {
-      photo.push(`http://${req.get('host')}/img/${item.filename}`)
-    })
-  }
-
-  console.log(photo)
-
-  if (photo === undefined) {
-    photos = undefined
-  } else {
-    photos = photo.toString()
-  }
-
-  console.log('This is photos:')
-  console.log(photos)
-
-  const data = {
-    name,
-    description,
-    qty,
-    price,
-    idCategory,
-    photos,
-    updatedAt
-  }
-
-  // console.log(data.photos)
+  // if (req.files) {
+  //   req.files.forEach(item => {
+  //     photo.push(`http://${req.get('host')}/img/${item.filename}`)
+  //   })
+  // }
 
   try {
-    const { rows: [count] } = await productsModel.checkExisting(id)
-    const result = parseInt(count.total)
+    if (req.files) {
+      const files = req.files
 
-    if (result === 0) {
-      return notFoundRes(res, 404, 'Data not found, you cannot edit the data which is not exist')
+      await Promise.all(
+        files.map(async (file) => {
+          const result = await cloudinary.uploader.upload(file.path, { folder: 'blanja/products' })
+          photo.push(result.url)
+        })
+      )
     }
 
-    // perbaiki dibagian ini, pas data not found tapi gambar masih terupload
+    const photos = photo.toString()
+
+    const data = {
+      name,
+      description,
+      qty,
+      price,
+      idCategory,
+      photos,
+      updatedAt,
+      condition
+    }
 
     await productsModel.update(data, id)
 

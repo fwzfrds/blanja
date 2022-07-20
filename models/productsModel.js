@@ -32,7 +32,7 @@ const insert = ({ name, description, qty, price, idCategory, photos, condition }
   })
 }
 
-const update = ({ name, description, qty, price, idCategory, photos, updatedAt }, id) => {
+const update = ({ name, description, qty, price, idCategory, photos, updatedAt, condition }, id) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE products SET 
             name = COALESCE($1, name), 
@@ -41,8 +41,9 @@ const update = ({ name, description, qty, price, idCategory, photos, updatedAt }
             price = COALESCE($4, price), 
             id_category = COALESCE($5, id_category), 
             image = COALESCE($6, image), 
-            updated_at = COALESCE($7, updated_at)
-            WHERE id = $8;`, [name, description, qty, price, idCategory, photos, updatedAt, id], (err, result) => {
+            updated_at = COALESCE($7, updated_at),
+            condition = COALESCE($8, condition)
+            WHERE id = $9;`, [name, description, qty, price, idCategory, photos, updatedAt, condition, id], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
