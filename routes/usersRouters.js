@@ -11,6 +11,7 @@ const {
   refreshToken
 } = require('../controllers/usersController')
 const { protect, isUser, isTokenValid } = require('../middlewares/authMiddleware')
+const uploadPhoto = require('../middlewares/uploadPhoto')
 
 //  ----> /users.....
 router
@@ -20,7 +21,9 @@ router
   .post('/registration', insertUsers)
   .post('/login', loginUsers)
   .post('/refresh-token', refreshToken)
-  .put('/edit', protect, isUser, updateUsers)
+  .put('/edit', protect, isUser, uploadPhoto.single('photo'), updateUsers)
   .delete('/:emailid', deleteUsers)
+
+// terakhir sampai sini atasi ketika update profile user yang ada gambarnya
 
 module.exports = router

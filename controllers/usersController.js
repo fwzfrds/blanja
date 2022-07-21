@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 const { response, notFoundRes } = require('../helper/common')
 const { generateToken, generateRefreshToken } = require('../helper/authHelper')
 const { sendEmail } = require('../helper/emailActivation')
+const cloudinary = require('../config/cloudinaryConfig')
 
 const errorServer = new createError.InternalServerError()
 
@@ -69,7 +70,7 @@ const getProfileDetail = async (req, res, next) => {
 }
 
 const insertUsers = async (req, res, next) => {
-  const { firstName, lastName, email: emailID, password, phone, activationID, genderID, birth, userAddress } = req.body
+  const { firstName, lastName, email: emailID, password, phone, activationID, genderID, birth, userAddress, photo } = req.body
 
   const salt = bcrypt.genSaltSync(10)
   const userPassword = bcrypt.hashSync(password, salt)
@@ -84,7 +85,8 @@ const insertUsers = async (req, res, next) => {
     activationID: activationID || 1,
     genderID: genderID || 1,
     birth,
-    userAddress
+    userAddress,
+    photo
   }
 
   try {
@@ -178,7 +180,7 @@ const userActivate = async (req, res, next) => {
   try {
     const emailID = req.decoded.email
     console.log(emailID)
-    const { firstName, lastName, email, userPassword, phone, gender, birth, userAddress } = req.body
+    const { firstName, lastName, email, userPassword, phone, gender, birth, userAddress, photo } = req.body
     const activatedAt = new Date()
 
     const data = {
@@ -191,7 +193,8 @@ const userActivate = async (req, res, next) => {
       gender,
       birth,
       userAddress,
-      activatedAt
+      activatedAt,
+      photo
     }
 
     console.log(data)
@@ -211,26 +214,39 @@ const updateUsers = async (req, res, next) => {
   const { firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress } = req.body
   const updatedAt = new Date()
 
-  const data = {
-    firstName,
-    lastName,
-    email,
-    userPassword,
-    phone,
-    activationStatus,
-    gender,
-    birth,
-    userAddress,
-    updatedAt
+  console.log(req.file)
+  let photo
+
+  const { rows: [count] } = await usersModel.checkExisting(emailID)
+  const result = parseInt(count.total)
+
+  if (result === 0) {
+    return notFoundRes(res, 404, 'Data not found')
   }
 
   try {
-    // const { rows: [count] } = await usersModel.checkExisting(emailID)
-    // const result = parseInt(count.total)
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: 'blanja/users' })
+      if (result) {
+        photo = result.url
+      }
+    }
 
-    // if (result === 0) {
-    //   return notFoundRes(res, 404, 'Data not found')
-    // }
+    console.log(photo)
+
+    const data = {
+      firstName,
+      lastName,
+      email,
+      userPassword,
+      phone,
+      activationStatus,
+      gender,
+      birth,
+      userAddress,
+      updatedAt,
+      photo
+    }
 
     await usersModel.updateProfile(data, emailID)
 

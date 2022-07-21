@@ -13,7 +13,7 @@ const select = ({ limit, offset }) => {
 
 const usersDetail = (email) => {
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT users.*, activation.activation_name, gender.gender_name FROM users INNER JOIN activation ON users.id_status = activation.id INNER JOIN gender ON users.id_gender = gender.id WHERE users.email = '${email}';`, (error, result) => {
+    pool.query(`SELECT users.*, activation.activation_status, gender.gender_name AS gender FROM users INNER JOIN activation ON users.id_status = activation.id INNER JOIN gender ON users.id_gender = gender.id WHERE users.email = '${email}';`, (error, result) => {
       if (!error) {
         resolve(result)
       } else {
@@ -35,9 +35,9 @@ const findByEmail = (email) => {
   })
 }
 
-const insert = ({ id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress }) => {
+const insert = ({ id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress, photo }) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO users(id, first_name, last_name, email, user_password, phone, id_status, id_gender, birth, user_address)VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress], (err, result) => {
+    pool.query('INSERT INTO users(id, first_name, last_name, email, user_password, phone, id_status, id_gender, birth, user_address, photo)VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id, firstName, lastName, email, userPassword, phone, activationID, genderID, birth, userAddress, photo], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -61,7 +61,8 @@ const activateStatus = ({
   gender,
   birth,
   userAddress,
-  activatedAt
+  activatedAt,
+  photo
 }, emailID) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE users SET 
@@ -74,8 +75,9 @@ const activateStatus = ({
                 id_gender = COALESCE($7, id_gender),  
                 birth = COALESCE($8, birth),  
                 user_address = COALESCE($9, user_address) ,
-                activated_at = COALESCE($10, activated_at) 
-                WHERE email = $11;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, activatedAt, emailID], (err, result) => {
+                activated_at = COALESCE($10, activated_at), 
+                photo = COALESCE($11, photo) 
+                WHERE email = $12;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, activatedAt, photo, emailID], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -95,7 +97,8 @@ const updateProfile = ({
   gender,
   birth,
   userAddress,
-  updatedAt
+  updatedAt,
+  photo
 }, emailID) => {
   return new Promise((resolve, reject) => {
     pool.query(`UPDATE users SET 
@@ -108,8 +111,9 @@ const updateProfile = ({
                 id_gender = COALESCE($7, id_gender),  
                 birth = COALESCE($8, birth),  
                 user_address = COALESCE($9, user_address) ,
-                updated_at = COALESCE($10, updated_at) 
-                WHERE email = $11;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, updatedAt, emailID], (err, result) => {
+                updated_at = COALESCE($10, updated_at), 
+                photo = COALESCE($11, photo) 
+                WHERE email = $12;`, [firstName, lastName, email, userPassword, phone, activationStatus, gender, birth, userAddress, updatedAt, photo, emailID], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
