@@ -201,7 +201,8 @@ const userActivate = async (req, res, next) => {
 
     await usersModel.activateStatus(data, emailID)
 
-    response(res, activatedAt, 200, 'Congrats ! your account has been activated')
+    res.redirect('https://blanja-app-fwzfrds.vercel.app/login')
+    // response(res, activatedAt, 200, 'Congrats ! your account has been activated')
   } catch (error) {
     console.log(error)
     next(new createError.InternalServerError())
