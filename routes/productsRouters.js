@@ -15,7 +15,7 @@ router
   .get('/', getProducts)
   .get('/detail/:id', detailProduct)
   .post('/add', protect, isAdmin, uploadPhoto.array('photo', 5), insertProduct)
-  .put('/edit/:id', protect, isAdmin, uploadPhoto.array('photo', 3), updateProduct)
+  .put('/edit/:id', protect, isAdmin, uploadPhoto.array('photo', 5), updateProduct)
   .delete('/:id', protect, isAdmin, deleteProduct)
 
 module.exports = router
