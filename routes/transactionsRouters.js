@@ -5,11 +5,13 @@ const {
   insertTransc,
   updateTransStatus
 } = require('../controllers/transcController')
+const { protect, isUser } = require('../middlewares/authMiddleware')
 
 //  ----> /transactions.....
 router
-  .get('/:id', getTransc)
-  .post('/', insertTransc)
+  // .get('/:id', getTransc)
+  .get('/', protect, isUser, getTransc)
+  .post('/', protect, isUser, insertTransc)
   .put('/:id', updateTransStatus)
 // .delete("/:id", cartsController.deleteCart);
 

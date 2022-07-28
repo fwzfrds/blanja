@@ -7,7 +7,7 @@ const errorServer = new createError.InternalServerError()
 const getCarts = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1
-    let limit = parseInt(req.query.limit) || 4
+    let limit = parseInt(req.query.limit) || 5
     const offset = (page - 1) * limit
 
     const id = req.decoded.id
@@ -31,6 +31,13 @@ const getCarts = async (req, res, next) => {
       dataPerPage: limit,
       totalData,
       totalPage
+    }
+
+    const products = result.rows
+    if (products) {
+      products.forEach(item => {
+        item.product_image = (item.product_image).split(',')
+      })
     }
 
     response(res, result.rows, 200, 'Get data success', pagination)

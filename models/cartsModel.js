@@ -5,7 +5,8 @@ const select = ({ limit, offset, id }) => {
     pool.query(`SELECT products.name AS name_product,
                     products.price AS price_product,
                     products.image AS product_image,
-                    carts.qty
+                    carts.qty,
+                    carts.id AS id_cart
                     FROM carts INNER JOIN products 
                     ON carts.id_product = products.id
                     WHERE carts.id_user = '${id}'

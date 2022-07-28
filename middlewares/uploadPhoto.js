@@ -22,7 +22,7 @@ const upload = multer({
     //   return cb(new Error('Only .png, .jpg and .jpeg format allowed!'))
     // }
     const ext = path.extname(file.originalname)
-    if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.pdf') {
+    if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.pdf' && ext !== '.webp') {
       cb(new Error('File type is not supported'), false)
       return
     }

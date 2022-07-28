@@ -1,6 +1,7 @@
 const pool = require('../db')
 
 const select = ({ limit, offset, id }) => {
+  console.log(id)
   return new Promise((resolve, reject) => {
     // pool.query(`SELECT * FROM transactions WHERE id_cart = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
     pool.query(`SELECT transactions.id, 
@@ -8,17 +9,19 @@ const select = ({ limit, offset, id }) => {
                   transactions.name,
                   transactions.address, 
                   transactions.phone, 
-                  carts.id_product, 
-                  carts.id_user, 
+                  transactions.status, 
+                  transactions.total, 
+                  carts.id_product,  
                   products.name AS product_name,
+                  products.image,
                   carts.qty, 
                   users.first_name, 
                   users.last_name 
                   FROM transactions 
                   INNER JOIN carts ON transactions.id_cart = carts.id 
-                  INNER JOIN users ON carts.id_user = users.id 
+                  INNER JOIN users ON iduser = users.id 
                   INNER JOIN products ON carts.id_product = products.id 
-                  WHERE id_user = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
+                  WHERE iduser = ${id} LIMIT ${limit} OFFSET ${offset};`, (err, result) => {
       if (!err) {
         resolve(result)
       } else {
@@ -41,9 +44,9 @@ const countTransc = (id) => {
   // perbaiki bagian count ini supaya count transaction berdasarkan id user
 }
 
-const insert = ({ idCart, name, phone, address, status }) => {
+const insert = ({ idCart, name, phone, address, total, idUser }) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO transactions(id_cart, name, phone, address, status)VALUES($1, $2, $3, $4, $5)', [idCart, name, phone, address, status], (err, result) => {
+    pool.query('INSERT INTO transactions(id_cart, name, phone, address, total, iduser)VALUES($1, $2, $3, $4, $5, $6)', [idCart, name, phone, address, total, idUser], (err, result) => {
       if (!err) {
         resolve(result)
       } else {
