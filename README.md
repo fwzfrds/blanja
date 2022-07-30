@@ -98,16 +98,23 @@ Contributions are what make the open source community such an amazing place to b
 
 
 ## Related Project
-* [`Blanja | E-commerce`](https://blanja-web-api.herokuapp.com)
+* [`Blanja REST API URL`](https://blanja-web-api.herokuapp.com)
+* [`Blanja Front End Repository`](https://github.com/fwzfrds/blanja-react-fe)
 
-## Front End Repo
-* [`Blanja Repo`](https://github.com/fwzfrds/blanja-react-fe)
+## Developer
 
-
-<!-- CONTACT -->
-## Contact
-
-Contributors names and contact info
-
-* Owner / Developer
-  * Muhammad Fawwaz Firdaus [@fwzfrds](https://github.com/fwzfrds)
+<center>
+  <table>
+    <tr>
+      <th>Owner | Developer</th>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/fwzfrds">
+          <img width="150" src="https://avatars.githubusercontent.com/u/85775604?v=4" alt="M. Fawwaz Firdaus"><br/>
+          <b>M. Fawwaz Firdaus</b>
+        </a>
+      </td>
+    </tr>
+  </table>
+</center>
