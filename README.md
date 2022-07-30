@@ -82,6 +82,8 @@ SECRET_KEY_JWT_2 = secret_key_for_JWT_2
 EMAIL_FOR_SENDEMAIL = email_for_sendemail_nodemailer
 PASS_SEND_EMAIL = email_password_sendemail_nodemailer
 
+or you can see the .env_example file
+
 ```
 
 <!-- CONTRIBUTING -->
