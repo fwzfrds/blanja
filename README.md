@@ -40,6 +40,7 @@ Blanja Rest API, is REST API used in [`Blanja`](https://blanja-app-fwzfrds.verce
 
 * [Node JS](https://nodejs.org/en/docs/)
 * [Express JS](https://expressjs.com/)
+* [PostgreSQL](https://www.postgresql.org/)
 * [Node Mailer](https://nodemailer.com/)
 * [Cloudinary](https://cloudinary.com/)
 
