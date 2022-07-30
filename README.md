@@ -3,7 +3,7 @@
 
   <h3 align="center">Blanja | E-commerce Web</h3>
   <p align="center">
-    <image align="center" width="200" src='https://res.cloudinary.com/wazcomp/image/upload/v1658419835/blanja/logo/blanja-logo_igkoib.png' />
+    <image align="center" width="100" src='https://res.cloudinary.com/wazcomp/image/upload/v1658419835/blanja/logo/blanja-logo_igkoib.png' />
   </p>
 
   <p align="center">
@@ -99,6 +99,9 @@ Contributions are what make the open source community such an amazing place to b
 
 ## Related Project
 * [`Blanja | E-commerce`](https://blanja-web-api.herokuapp.com)
+
+## Front End Repo
+* [`Blanja Repo`](https://github.com/fwzfrds/blanja-react-fe)
 
 
 <!-- CONTACT -->
